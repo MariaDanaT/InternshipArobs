@@ -4,17 +4,20 @@ import java.util.Random;
 
 
 public class SortElements {
-
+    static void display(int arr[]){
+        for (int e:arr
+             ) {
+            System.out.println(e);
+        }
+    }
     static public void main(String[] args) {
         int[] arr = new int[10];
         Random r = new Random();
         for (int i = 0; i < 10; i++) {
-            arr[i] = r.nextInt(100);
+            arr[i] = r.nextInt();
         }
-        for (int e : arr
-        ) {
-            System.out.println(e);
-        }
+        display(arr);
+
         //bubble sort
         int n = 10, aux;
         while (n > 1) {
@@ -27,9 +30,7 @@ public class SortElements {
             }
             n--;
         }
-        for (int e : arr
-        ) {
-            System.out.println(e);
-        }
+        System.out.println("Sorted elements:");
+        display(arr);
     }
 }
