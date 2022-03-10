@@ -4,8 +4,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
-    private TemperatureSensor temperatureSensor;
-    private LightSensor lightSensor;
 
     public void control() {
         Timer t = new Timer();
