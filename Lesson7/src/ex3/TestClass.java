@@ -1,7 +1,6 @@
 package ex3;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Scanner;
 
 public class TestClass {
@@ -11,7 +10,7 @@ public class TestClass {
         System.out.println("Choose Encrypt/Decrypt:");
         String option = scanner.nextLine();
 
-        if(option.equals("Encrypt")){
+        if (option.equals("Encrypt")) {
             ReadFile readFile = new ReadFile("C:\\Users\\maria.tomos\\Documents\\Git\\InternshipArobsWeek1\\Lesson7\\src\\ex3\\data.dec");
             WriteFile writeFile = new WriteFile("C:\\Users\\maria.tomos\\Documents\\Git\\InternshipArobsWeek1\\Lesson7\\src\\ex3\\data.enc");
             try {
@@ -23,7 +22,7 @@ public class TestClass {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else if(option.equals("Decrypt")){
+        } else if (option.equals("Decrypt")) {
             ReadFile readFile = new ReadFile("C:\\Users\\maria.tomos\\Documents\\Git\\InternshipArobsWeek1\\Lesson7\\src\\ex3\\data.enc");
             WriteFile writeFile = new WriteFile("C:\\Users\\maria.tomos\\Documents\\Git\\InternshipArobsWeek1\\Lesson7\\src\\ex3\\data.dec");
             try {
@@ -35,8 +34,7 @@ public class TestClass {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else System.out.println("The option does not exist!");
+        } else System.out.println("The option does not exist!");
 
     }
 }
