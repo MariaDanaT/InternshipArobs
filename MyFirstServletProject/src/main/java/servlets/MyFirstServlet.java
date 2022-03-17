@@ -10,26 +10,30 @@ import java.io.PrintWriter;
 
 @WebServlet(name = "MyFirstServlet", urlPatterns = "/myPage")
 public class MyFirstServlet extends HttpServlet {
-    private int first = 0, second = 0;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter printWriter = resp.getWriter();
 
         resp.setContentType("text/html");
-        printWriter.println("<html>" + "<head><title>Add two numbers</title></head>" +
-                "<body><h1>Add two numbers</h1>" + "<form action=\"./myPage\" method = \"POST\">" +
-                "First number <input type = \"text\" name = \"first\" ><br> " +
-                "Second number <input type = \"text\" name = \"second\" ><br> " +
-                "<input type=\"submit\" value=\"Add\" ><br><br>" +
-                "</form>" +
-                "</body>" +
-                "</html>");
+        printWriter.println("""
+                <html>
+                    <head><title>Add two numbers</title></head>
+                    <body><h1>Add two numbers</h1>
+                        <form action="./myPage" method = "POST">
+                        First number <input type = "text" name = "first" ><br>
+                        Second number <input type = "text" name = "second" ><br>
+                        <input type="submit" value="Add" ><br><br>
+                        </form>
+                    </body>
+                </html>""");
 
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        int first = 0;
+        int second = 0;
         try {
             if (req.getParameter("first") != null)
                 first = Integer.parseInt(req.getParameter("first"));
@@ -44,8 +48,6 @@ public class MyFirstServlet extends HttpServlet {
         }
         resp.setContentType("text/html");
         resp.getWriter().println("Sum: <input type=\"text\" disabled =\"true\" value=\"" + (first + second) + "\" >");
-        first = 0;
-        second = 0;
 
     }
 }
