@@ -32,20 +32,12 @@ public class MyFirstServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int first = 0;
-        int second = 0;
-        try {
-            if (req.getParameter("first") != null)
-                first = Integer.parseInt(req.getParameter("first"));
-        } catch (Exception e) {
-            resp.getWriter().println("<span style=\"color:red\">First input is not a number (default value 0)</span><br>");
-        }
-        try {
-            if (req.getParameter("second") != null)
-                second = Integer.parseInt(req.getParameter("second"));
-        } catch (Exception e) {
-            resp.getWriter().println("<span style=\"color:red\">Second input is not a number (default value 0)</span><br>");
-        }
+        int first;
+        int second;
+
+        first = Integer.parseInt(req.getParameter("first"));
+        second = Integer.parseInt(req.getParameter("second"));
+
         resp.setContentType("text/html");
         resp.getWriter().println("Sum: <input type=\"text\" disabled =\"true\" value=\"" + (first + second) + "\" >");
 
