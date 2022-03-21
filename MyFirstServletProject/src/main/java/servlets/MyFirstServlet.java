@@ -38,6 +38,6 @@ public class MyFirstServlet extends HttpServlet {
         RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/jsp/myPage.jsp");
         requestDispatcher.forward(req,resp);
 
-        logger.info("Call method doPost!");
+        logger.info("Call method doPost with parameters {} and {}", first, second);
     }
 }
