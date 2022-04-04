@@ -9,6 +9,9 @@ public class UserViewDTO {
         this.password = password;
     }
 
+    public UserViewDTO() {
+    }
+
     public String getEmail() {
         return email;
     }

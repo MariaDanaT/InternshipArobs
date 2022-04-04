@@ -38,6 +38,12 @@ public class UserRepository {
             return user;
         });
     }
+    public User addUser(User user) {
+        String query = "INSERT INTO Users(id, firstName, lastName, email, password, originCountry, role) VALUES (?,?,?,?,?,?,?)";
+        jdbcTemplate.update(query, user.getId() ,user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getOriginCountry(), user.getRole());
+        return jdbcTemplate.queryForObject("SELECT * FROM Users WHERE id = LAST_INSERT_ID()", new BeanPropertyRowMapper<>(User.class));
+
+    }
 
     public int addUserUsingFirstNameAndLastNameParameters(String firstName, String lastName) {
         return jdbcTemplate.update(
