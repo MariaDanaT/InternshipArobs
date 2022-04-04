@@ -1,6 +1,6 @@
 package com.example.musify.security;
 
-import org.springframework.data.util.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,11 +42,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         if (token != null) {
             token = token.replaceAll(TOKEN_PREFIX, "").trim();
 
-            Pair<Integer, String> userIdAndRole = JwtUtils.validateToken(token);
-            String userId = String.valueOf(userIdAndRole.getFirst());
-            String role = userIdAndRole.getSecond();
+            Triple<Integer, String, String> userIdAndRole = JwtUtils.validateToken(token);
+            String userId = String.valueOf(userIdAndRole.getLeft());
+            String email = userIdAndRole.getMiddle();
+            String role = userIdAndRole.getRight();
 
-            if (userId != null && role != null) {
+            if (userId != null && email != null && role != null) {
                 // new arraylist means authorities
                 return new UsernamePasswordAuthenticationToken(userIdAndRole, null, new ArrayList<>());
             }

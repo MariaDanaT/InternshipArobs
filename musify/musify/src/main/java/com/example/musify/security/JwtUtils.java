@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.springframework.data.util.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,7 +31,7 @@ public class JwtUtils {
                 .withClaim("role", role)
                 .sign(algorithm);
     }
-    public static Pair<Integer, String> validateToken(String jwtToken) {
+    public static Triple<Integer, String, String> validateToken(String jwtToken) {
         Algorithm algorithm = Algorithm.HMAC256(signatureSecret);
 
         JWTVerifier verifier = JWT.require(algorithm)
@@ -41,8 +41,9 @@ public class JwtUtils {
 
         DecodedJWT decodedJWT = verifier.verify(jwtToken);
         Integer userId = decodedJWT.getClaim("userId").asInt();
+        String email = decodedJWT.getClaim("email").asString();
         String role = decodedJWT.getClaim("role").asString();
 
-        return Pair.of(userId, role);
+        return Triple.of(userId, email, role);
     }
 }
