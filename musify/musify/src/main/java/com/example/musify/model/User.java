@@ -1,6 +1,5 @@
 package com.example.musify.model;
 
-import java.io.Serializable;
 
 public class User {
     private int id;
@@ -8,19 +7,19 @@ public class User {
     private String lastName;
     private String email;
     private String password;
-    private String originCountry;
+    private String country;
     private String role;
 
     public User() {
     }
 
-    public User(int id, String firstName, String lastName, String email, String password, String originCountry, String role) {
+    public User(int id, String firstName, String lastName, String email, String password, String country, String role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.originCountry = originCountry;
+        this.country = country;
         this.role = role;
     }
 
@@ -72,11 +71,11 @@ public class User {
         this.role = role;
     }
 
-    public String getOriginCountry() {
-        return originCountry;
+    public String getCountry() {
+        return country;
     }
 
-    public void setOriginCountry(String originCountry) {
-        this.originCountry = originCountry;
+    public void setCountry(String country) {
+        this.country = country;
     }
 }

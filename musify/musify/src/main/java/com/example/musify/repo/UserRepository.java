@@ -28,26 +28,26 @@ public class UserRepository {
             User user = new User();
             while (resultSet.next()) {
                 user.setId(resultSet.getInt("id"));
-                user.setFirstName(resultSet.getString("firstName"));
-                user.setLastName(resultSet.getString("lastName"));
+                user.setFirstName(resultSet.getString("first_name"));
+                user.setLastName(resultSet.getString("last_name"));
                 user.setEmail(resultSet.getString("email"));
                 user.setPassword(resultSet.getString("password"));
-                user.setOriginCountry(resultSet.getString("originCountry"));
+                user.setCountry(resultSet.getString("country"));
                 user.setRole(resultSet.getString("role"));
             }
             return user;
         });
     }
     public User addUser(User user) {
-        String query = "INSERT INTO Users(id, firstName, lastName, email, password, originCountry, role) VALUES (?,?,?,?,?,?,?)";
-        jdbcTemplate.update(query, user.getId() ,user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getOriginCountry(), user.getRole());
+        String query = "INSERT INTO Users(id, first_name, last_name, email, password, country, role) VALUES (?,?,?,?,?,?,?)";
+        jdbcTemplate.update(query, user.getId() ,user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getCountry(), user.getRole());
         return jdbcTemplate.queryForObject("SELECT * FROM Users WHERE id = LAST_INSERT_ID()", new BeanPropertyRowMapper<>(User.class));
 
     }
 
     public int addUserUsingFirstNameAndLastNameParameters(String firstName, String lastName) {
         return jdbcTemplate.update(
-                "INSERT INTO Users(firstName, lastName) VALUES (?, ?)", firstName, lastName);
+                "INSERT INTO Users(first_name, last_name) VALUES (?, ?)", firstName, lastName);
     }
 
     public List<User> getAll() {
