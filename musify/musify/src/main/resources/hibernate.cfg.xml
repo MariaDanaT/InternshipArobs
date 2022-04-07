@@ -10,5 +10,7 @@
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">password</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <mapping class="com.example.musify.entity.Artist"/>
+        <mapping class="com.example.musify.entity.Band"/>
     </session-factory>
 </hibernate-configuration>

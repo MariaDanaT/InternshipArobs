@@ -3,11 +3,17 @@ package com.example.musify.entity;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "artists")
+@NamedQueries({
+        @NamedQuery(name = "getAllArtists", query = "FROM Artist"),
+        @NamedQuery(name = "getArtistById", query = "FROM Artist WHERE id = :id")
+})
 public class Artist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +48,42 @@ public class Artist {
     public void removeBand(Band b) {
         this.bands.remove(b);
         b.getArtists().remove(this);
+    }
+
+    public Artist() {
+    }
+
+    public Artist(String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate, String type) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.stageName = stageName;
+        this.birthday = birthday;
+        this.activityStartDate = activityStartDate;
+        this.activityEndDate = activityEndDate;
+        this.type = type;
+    }
+
+    public Artist(int id, String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate, String type) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.stageName = stageName;
+        this.birthday = birthday;
+        this.activityStartDate = activityStartDate;
+        this.activityEndDate = activityEndDate;
+        this.type = type;
+    }
+
+    public Artist(int id, String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate, String type, Set<Band> bands) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.stageName = stageName;
+        this.birthday = birthday;
+        this.activityStartDate = activityStartDate;
+        this.activityEndDate = activityEndDate;
+        this.type = type;
+        this.bands = bands;
     }
 
     public int getId() {
@@ -114,5 +156,24 @@ public class Artist {
 
     public void setBands(Set<Band> bands) {
         this.bands = bands;
+    }
+
+    @Override
+    public String toString() {
+
+        List<Band> bandsToString = new ArrayList<>();
+        bands.forEach(x -> {
+            bandsToString.add(new Band(x.getId(), x.getName(), x.getLocation(), x.getActivityStartDate(), x.getActivityEndDate()));
+        });
+        return "Artist{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", stageName='" + stageName + '\'' +
+                ", birthday=" + birthday +
+                ", activityStartDate='" + activityStartDate + '\'' +
+                ", activityEndDate='" + activityEndDate + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

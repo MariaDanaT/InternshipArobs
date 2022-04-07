@@ -1,7 +1,9 @@
 package com.example.musify.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,6 +24,27 @@ public class Band {
 
     @ManyToMany(mappedBy = "bands")
     private Set<Artist> artists = new HashSet<>();
+
+    //, fetch = FetchType.LAZY
+    public Band() {
+    }
+
+    public Band(int id, String name, String location, String activityStartDate, String activityEndDate) {
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.activityStartDate = activityStartDate;
+        this.activityEndDate = activityEndDate;
+    }
+
+    public Band(int id, String name, String location, String activityStartDate, String activityEndDate, Set<Artist> artists) {
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.activityStartDate = activityStartDate;
+        this.activityEndDate = activityEndDate;
+        this.artists = artists;
+    }
 
     public int getId() {
         return id;
@@ -69,5 +92,22 @@ public class Band {
 
     public void setArtists(Set<Artist> artists) {
         this.artists = artists;
+    }
+
+    @Override
+    public String toString() {
+        List<Artist> artistsToString = new ArrayList<>();
+        artists.forEach(x -> {
+            artistsToString.add(new Artist(x.getId(), x.getFirstName(), x.getLastName(),
+                    x.getStageName(), x.getBirthday(), x.getActivityStartDate(), x.getActivityEndDate(), x.getType()));
+        });
+        return "Band{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", location='" + location + '\'' +
+                ", activityStartDate='" + activityStartDate + '\'' +
+                ", activityEndDate='" + activityEndDate + '\'' +
+                ", artists=" + artistsToString +
+                '}';
     }
 }
