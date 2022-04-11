@@ -14,9 +14,9 @@ import java.util.Set;
 })
 public class Artist {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     @Column(name = "first_name")
     private String firstName;
     @Column(name = "last_name")
@@ -72,17 +72,17 @@ public class Artist {
         this.type = type;
     }
 
-    public Artist(int id, String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate, String type, Set<Band> bands) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.stageName = stageName;
-        this.birthday = birthday;
-        this.activityStartDate = activityStartDate;
-        this.activityEndDate = activityEndDate;
-        this.type = type;
-        this.bands = bands;
-    }
+//    public Artist(int id, String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate, String type, Set<Band> bands) {
+//        this.id = id;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.stageName = stageName;
+//        this.birthday = birthday;
+//        this.activityStartDate = activityStartDate;
+//        this.activityEndDate = activityEndDate;
+//        this.type = type;
+//        this.bands = bands;
+//    }
 
     public int getId() {
         return id;
