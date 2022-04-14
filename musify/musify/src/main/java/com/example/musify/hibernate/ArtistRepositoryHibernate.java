@@ -1,6 +1,6 @@
 package com.example.musify.hibernate;
 
-import com.example.musify.entity.Artist;
+import com.example.musify.entity.Person;
 import com.example.musify.entity.Band;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -8,16 +8,15 @@ import org.hibernate.Transaction;
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class ArtistRepositoryHibernate {
 
-    public List<Artist> getAllArtists() {
+    public List<Person> getAllArtists() {
         Transaction transaction = null;
-        List<Artist> artists = new ArrayList<>();
+        List<Person> people = new ArrayList<>();
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            artists = session.createNamedQuery("getAllArtists", Artist.class).getResultList();
+            people = session.createNamedQuery("getAllArtists", Person.class).getResultList();
 
             transaction.commit();
         } catch (Exception e) {
@@ -26,17 +25,17 @@ public class ArtistRepositoryHibernate {
             }
             e.getMessage();
         }
-        return artists;
+        return people;
     }
 
-    public Artist getArtistById(int id) {
-        Artist artist = null;
+    public Person getArtistById(int id) {
+        Person person = null;
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            Query query = session.createNamedQuery("getArtistById", Artist.class);
+            Query query = session.createNamedQuery("getArtistById", Person.class);
             query.setParameter("id", id);
-            artist = (Artist) query.getResultList().get(0);
+            person = (Person) query.getResultList().get(0);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -44,14 +43,14 @@ public class ArtistRepositoryHibernate {
             }
             e.getMessage();
         }
-        return artist;
+        return person;
     }
 
-    public void addArtist(Artist artist) {
+    public void addArtist(Person person) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(artist);
+            session.save(person);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -61,63 +60,62 @@ public class ArtistRepositoryHibernate {
         }
     }
 
-    public Artist updateArtist(Artist artist) {
+    public Person updateArtist(Person person) {
         Transaction transaction = null;
-        Artist artistUpdated = null;
+        Person personUpdated = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            artistUpdated = session.get(Artist.class, artist.getId());
-            if (artistUpdated != null) {
-                artistUpdated.setFirstName(artist.getFirstName());
-                artistUpdated.setLastName(artist.getLastName());
-                artistUpdated.setStageName(artist.getStageName());
-                artistUpdated.setBirthday(artist.getBirthday());
-                artistUpdated.setActivityStartDate(artist.getActivityStartDate());
-                artistUpdated.setActivityEndDate(artist.getActivityEndDate());
-                artistUpdated.setType(artist.getType());
-                session.update(artistUpdated);
+            personUpdated = session.get(Person.class, person.getId());
+            if (personUpdated != null) {
+                personUpdated.setFirstName(person.getFirstName());
+                personUpdated.setLastName(person.getLastName());
+                personUpdated.setStageName(person.getStageName());
+                personUpdated.setBirthday(person.getBirthday());
+                personUpdated.setActivityStartDate(person.getActivityStartDate());
+                personUpdated.setActivityEndDate(person.getActivityEndDate());
+                session.update(personUpdated);
             }
             transaction.commit();
-            return artistUpdated;
+            return personUpdated;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.getMessage();
         }
-        return artistUpdated;
+        return personUpdated;
     }
 
-    public Artist deleteArtist(int id) {
+    public Person deleteArtist(int id) {
         Transaction transaction = null;
-        Artist artistDeleted = null;
+        Person personDeleted = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            artistDeleted = session.get(Artist.class, id);
-            if (artistDeleted != null)
-                session.delete(artistDeleted);
+            personDeleted = session.get(Person.class, id);
+            if (personDeleted != null)
+                session.delete(personDeleted);
             transaction.commit();
-            return artistDeleted;
+            return personDeleted;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.getMessage();
         }
-        return artistDeleted;
+        return personDeleted;
     }
 
-    public List<Band> getBandsForAnArtist(Artist artist) {
+    public List<Band> getBandsForAnArtist(Person person) {
         Transaction transaction = null;
         List<Band> bands = new ArrayList<>();
-        Artist artistFromDB = null;
+        Person personFromDB = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            Query query = session.createQuery("FROM Artist a JOIN FETCH a.bands AS b WHERE a.id = :ida").setParameter("ida", artist.getId());
+            Query query = session.createQuery("FROM Artist a JOIN FETCH a.bands AS b WHERE a.id = :ida").setParameter("ida", person.getId());
             if (query.getSingleResult() != null)
-                artistFromDB = (Artist) query.getSingleResult();
-            if (artistFromDB.getBands() != null)
-                bands.addAll(artistFromDB.getBands());
+                personFromDB = (Person) query.getSingleResult();
+            if (personFromDB.getBands() != null)
+                bands.addAll(personFromDB.getBands());
 
             transaction.commit();
         } catch (Exception e) {

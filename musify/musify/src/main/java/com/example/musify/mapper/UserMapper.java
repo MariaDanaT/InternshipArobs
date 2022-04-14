@@ -2,11 +2,11 @@ package com.example.musify.mapper;
 
 import com.example.musify.dto.RegisterUserDTO;
 import com.example.musify.dto.UserDTO;
-import com.example.musify.model.User;
+import com.example.musify.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     @Mapping(target = "firstName", expression = "java(userDTO.getFullName().split(\" \")[0])")
@@ -14,11 +14,11 @@ public interface UserMapper {
     User userDTOToUser(UserDTO userDTO);
 
     @Mapping(target = "fullName", expression = "java(user.getFirstName() +\" \"+ user.getLastName())")
-    UserDTO userToUserDTO(User user);
+    UserDTO userDTOFromUser(User user);
 
     @Mapping(target = "role", expression = "java(\"regular\")")
-    User RegisterUserDTOTToUser(RegisterUserDTO registerUserDTO);
+    User registerUserDTOTToUser(RegisterUserDTO registerUserDTO);
     @Mapping(target = "confirmPassword", expression = "java(user.getPassword())")
-    RegisterUserDTO UserToRegisterUserDTO(User user);
+    RegisterUserDTO userToRegisterUserDTO(User user);
 
 }

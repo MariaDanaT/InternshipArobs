@@ -1,6 +1,5 @@
-package com.example.musify.dto.artistdto;
+package com.example.musify.dto.persondto;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,8 +7,7 @@ import java.sql.Date;
 
 @Data
 @NoArgsConstructor
-@Builder
-public class ArtistDTO {
+public class PersonDTO {
     private Integer id;
     private String firstName;
     private String lastName;
@@ -17,9 +15,9 @@ public class ArtistDTO {
     private Date birthday;
     private String activityStartDate;
     private String activityEndDate;
-    private String type;
 
-    public ArtistDTO(Integer id, String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate, String type) {
+
+    public PersonDTO(Integer id, String firstName, String lastName, String stageName, Date birthday, String activityStartDate, String activityEndDate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -27,7 +25,6 @@ public class ArtistDTO {
         this.birthday = birthday;
         this.activityStartDate = activityStartDate;
         this.activityEndDate = activityEndDate;
-        this.type = type;
     }
 
 }

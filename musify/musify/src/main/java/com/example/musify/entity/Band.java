@@ -1,11 +1,18 @@
 package com.example.musify.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "bands")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Band {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +28,12 @@ public class Band {
     private String activityEndDate;
 
     @ManyToMany(mappedBy = "bands")
-    private Set<Artist> artists = new HashSet<>();
-    
-    public Band() {
-    }
+    private Set<Person> people = new HashSet<>();
+
+    @OneToMany(mappedBy = "band")
+    private Set<Album> albums = new HashSet<>();
+
+    //addSong, removeSong
 
     public Band(int id, String name, String location, String activityStartDate, String activityEndDate) {
         this.id = id;
@@ -34,61 +43,13 @@ public class Band {
         this.activityEndDate = activityEndDate;
     }
 
-    public Band(int id, String name, String location, String activityStartDate, String activityEndDate, Set<Artist> artists) {
+    public Band(int id, String name, String location, String activityStartDate, String activityEndDate, Set<Person> people) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.activityStartDate = activityStartDate;
         this.activityEndDate = activityEndDate;
-        this.artists = artists;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getActivityStartDate() {
-        return activityStartDate;
-    }
-
-    public void setActivityStartDate(String activityStartDate) {
-        this.activityStartDate = activityStartDate;
-    }
-
-    public String getActivityEndDate() {
-        return activityEndDate;
-    }
-
-    public void setActivityEndDate(String activityEndDate) {
-        this.activityEndDate = activityEndDate;
-    }
-
-    public Set<Artist> getArtists() {
-        return artists;
-    }
-
-    public void setArtists(Set<Artist> artists) {
-        this.artists = artists;
+        this.people = people;
     }
 
     @Override

@@ -10,7 +10,12 @@
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">password</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-        <mapping class="com.example.musify.entity.Artist"/>
+        <mapping class="com.example.musify.entity.Person"/>
         <mapping class="com.example.musify.entity.Band"/>
+        <mapping class="com.example.musify.entity.User"/>
+        <mapping class="com.example.musify.entity.Song"/>
+        <mapping class="com.example.musify.entity.Playlist"/>
+        <mapping class="com.example.musify.entity.AlternativeSongTitle"/>
+        <mapping class="com.example.musify.entity.Album"/>
     </session-factory>
 </hibernate-configuration>

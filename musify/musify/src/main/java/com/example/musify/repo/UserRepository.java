@@ -1,6 +1,7 @@
 package com.example.musify.repo;
 
-import com.example.musify.model.User;
+import com.example.musify.entity.User;
+//import com.example.musify.model.User;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
