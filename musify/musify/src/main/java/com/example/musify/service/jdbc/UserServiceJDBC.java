@@ -1,11 +1,11 @@
-package com.example.musify.service.hibernate;
+package com.example.musify.service.jdbc;
 
-import com.example.musify.dto.RegisterUserDTO;
-import com.example.musify.dto.UserDTO;
+import com.example.musify.dto.userdto.RegisterUserDTO;
+import com.example.musify.dto.userdto.UserViewDTO;
 import com.example.musify.entity.User;
 import com.example.musify.exception.UnauthorizedException;
 import com.example.musify.mapper.UserMapper;
-import com.example.musify.repo.UserRepository;
+import com.example.musify.repo.UserRepositoryJDBC;
 import com.example.musify.security.JwtUtils;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@Service
-public class UserService {
+@Service
+public class UserServiceJDBC {
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryJDBC userRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -27,7 +27,7 @@ public class UserService {
         return userRepository.addUserUsingFirstNameAndLastNameParameters(firstName, lastName);
     }
 
-    public UserDTO findUserUsingEmailAndPassword(String email, String password) {
+    public UserViewDTO findUserUsingEmailAndPassword(String email, String password) {
         return userMapper.userDTOFromUser(userRepository.findUserUsingEmailAndPassword(email, password));
     }
 
@@ -50,13 +50,13 @@ public class UserService {
         byte[] bytes = registerUserDTO.getPassword().getBytes();
         String encoded = Hex.encodeHexString(bytes);
         registerUserDTO.setPassword(encoded);
-        User user = userRepository.addUser(userMapper.registerUserDTOTToUser(registerUserDTO));
+        User user = userRepository.addUser(userMapper.registerUserDTOToUser(registerUserDTO));
         return JwtUtils.generateToken(user.getId(), user.getEmail(), user.getRole());
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> getAll() {
-//        List<UserDTO> userDTOS = new ArrayList<>();
+    public List<UserViewDTO> getAll() {
+//        List<UserViewDTO> userDTOS = new ArrayList<>();
         return userRepository.getAll().stream()
                 .map(user -> userMapper.userDTOFromUser(user))
                 .collect(Collectors.toList());

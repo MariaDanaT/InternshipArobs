@@ -10,11 +10,11 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.util.List;
 
-//@Repository
-public class UserRepository {
+@Repository
+public class UserRepositoryJDBC {
     private JdbcTemplate jdbcTemplate;
 
-    public UserRepository(DataSource dataSource) {
+    public UserRepositoryJDBC(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

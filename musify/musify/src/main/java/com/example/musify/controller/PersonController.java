@@ -18,24 +18,29 @@ public class PersonController {
     public PersonController(PersonService personService) {
         this.personService = personService;
     }
+
     @GetMapping("/persons")
-    public List<PersonDTO> getArtists(){
+    public List<PersonDTO> getPersons() {
         return personService.getPersons();
     }
+
     @GetMapping(value = "/persons/{id}", produces = "application/json")
-    public Optional<PersonDTO> getArtistById(@RequestParam int id){
+    public Optional<PersonDTO> getPersonById(@RequestParam int id) {
         return personService.getPersonById(id);
     }
+
     @PostMapping(value = "/persons")
-    public ResponseEntity<PersonDTO> addArtist(@RequestBody PersonDTO personDTO){
+    public ResponseEntity<PersonDTO> addPerson(@RequestBody PersonDTO personDTO) {
         return new ResponseEntity<>(personService.addPerson(personDTO), HttpStatus.OK);
     }
+
     @PutMapping(value = "/persons/{id}")
-    public ResponseEntity<PersonDTO> updateArtist(@PathVariable int id , @RequestBody PersonDTO personDTO){
+    public ResponseEntity<Optional<PersonDTO>> updatePerson(@PathVariable int id, @RequestBody PersonDTO personDTO) {
         return new ResponseEntity<>(personService.updatePerson(id, personDTO), HttpStatus.OK);
     }
+
     @DeleteMapping(value = "/persons/{id}")
-    public ResponseEntity<String> deleteArtist(@PathVariable int id){
+    public ResponseEntity<String> deletePerson(@PathVariable int id) {
         personService.deletePerson(id);
         return new ResponseEntity<>("Deleted with success!", HttpStatus.OK);
     }
