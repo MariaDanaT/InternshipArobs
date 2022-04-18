@@ -1,4 +1,4 @@
-package com.example.musify.dto;
+package com.example.musify.dto.userdto;
 
 
 import lombok.Getter;

@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserViewDTO {
+public class UserLoginDTO {
     private String email;
     private String password;
 
-    public UserViewDTO(String mail, String password) {
+    public UserLoginDTO(String mail, String password) {
         this.email = mail;
         this.password = password;
     }

@@ -1,9 +1,9 @@
 package com.example.musify.controller;
 
 
-import com.example.musify.dto.RegisterUserDTO;
-import com.example.musify.dto.UserDTO;
-import com.example.musify.dto.UserViewDTO;
+import com.example.musify.dto.userdto.RegisterUserDTO;
+import com.example.musify.dto.userdto.UserViewDTO;
+import com.example.musify.dto.userdto.UserLoginDTO;
 import com.example.musify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,34 +12,38 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-
-//    @PostMapping(value = "/login")
-//    public UserDTO findUserUsingEmailAndPassword(@RequestBody UserDTO userDTO) {
-//        return userService.findUserUsingEmailAndPassword(userDTO.getEmail(),userDTO.getPassword());
-//    }
-
-    @PostMapping(value = "/login")
-    public ResponseEntity<String> login(@RequestBody UserViewDTO userViewDTO) {
-        String token = userService.login(userViewDTO.getEmail(), userViewDTO.getPassword());
-        return new ResponseEntity<>(token, HttpStatus.OK);
+    @GetMapping
+    public List<UserViewDTO> users(){
+        return userService.allUsers();
     }
-
-    @GetMapping(value = "/allUsers", produces = "application/json")
-    public List<UserDTO> getAllUsers() {
-        return userService.getAll();
+    @PostMapping(value = "/login")
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+        String token = userService.login(userLoginDTO);
+        return new ResponseEntity<>(token, HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> addUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
-        String token = userService.addUser(registerUserDTO);
-        return new ResponseEntity<>(token, HttpStatus.OK);
+    public ResponseEntity<UserViewDTO> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+        UserViewDTO userViewDTO = userService.register(registerUserDTO);
+        return new ResponseEntity<>(userViewDTO, HttpStatus.OK);
+    }
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<Optional<UserViewDTO>> inactivate(@RequestParam int id){
+        Optional<UserViewDTO> optional = userService.inactivate(id);
+        return new ResponseEntity<>(optional,HttpStatus.OK);
+    }
+    @PutMapping("/update")
+    public ResponseEntity<UserViewDTO> update(@RequestBody UserViewDTO userViewDTO){
+        UserViewDTO userUpdated = userService.update(userViewDTO);
+        return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 }
