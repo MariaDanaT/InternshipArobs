@@ -33,10 +33,8 @@ public class Playlist {
     @ManyToMany(mappedBy = "followedPlaylists")
     private Set<User> users = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "playlists_songs",
-            joinColumns = {@JoinColumn(name = "playlist_id")},
-            inverseJoinColumns = {@JoinColumn(name = "song_id")})
-    private Set<Song> songs = new HashSet<>();
+    @OneToMany(mappedBy = "playlist")
+    private Set<PlaylistsSongs> playlistsSongs = new HashSet<>();
+
 
 }

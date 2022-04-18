@@ -1,7 +1,6 @@
 package com.example.musify.repo;
 
 import com.example.musify.entity.User;
-//import com.example.musify.model.User;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -11,7 +10,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.util.List;
 
-@Repository
+//@Repository
 public class UserRepository {
     private JdbcTemplate jdbcTemplate;
 

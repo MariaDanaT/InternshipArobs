@@ -1,4 +1,4 @@
-package com.example.musify.service;
+package com.example.musify.service.hibernate;
 
 import com.example.musify.dto.RegisterUserDTO;
 import com.example.musify.dto.UserDTO;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+//@Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;

@@ -34,14 +34,14 @@ public class Song {
     @JoinColumn(name = "album_id")
     private Album album;
 
-    @ManyToMany(mappedBy = "songs")
-    private Set<Playlist> playlists = new HashSet<>();
-
     @ManyToMany
     @JoinTable(name = "songs_persons",
             joinColumns = {@JoinColumn(name = "song_id")},
             inverseJoinColumns = {@JoinColumn(name = "person_id")})
     private Set<Person> contributors = new HashSet<>();
+
+    @OneToMany(mappedBy = "songFromPlaylist")
+    private Set<PlaylistsSongs> playlistsSongs = new HashSet<>();
 
     public void addAlternativeSongTitle(AlternativeSongTitle alternativeSongTitle) {
         this.alternativeSongTitles.add(alternativeSongTitle);

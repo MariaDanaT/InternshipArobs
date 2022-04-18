@@ -1,4 +1,4 @@
-package com.example.musify.dto;
+package com.example.musify.dto.userdto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,15 +14,12 @@ public class UserDTO {
     private String fullName;
     @NotNull
     private String email;
-    @NotNull
-    private String password;
     private Boolean deleted;
 
-    public UserDTO(int id, String fullName, String email, String password, Boolean deleted) {
+    public UserDTO(int id, String fullName, String email, Boolean deleted) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
-        this.password = password;
         this.deleted = deleted;
     }
 }

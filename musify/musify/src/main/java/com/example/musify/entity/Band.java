@@ -17,7 +17,7 @@ public class Band {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
     @Column(name = "name")
     private String name;
     @Column(name = "location")
@@ -35,7 +35,7 @@ public class Band {
 
     //addSong, removeSong
 
-    public Band(int id, String name, String location, String activityStartDate, String activityEndDate) {
+    public Band(Integer id, String name, String location, String activityStartDate, String activityEndDate) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -43,7 +43,7 @@ public class Band {
         this.activityEndDate = activityEndDate;
     }
 
-    public Band(int id, String name, String location, String activityStartDate, String activityEndDate, Set<Person> people) {
+    public Band(Integer id, String name, String location, String activityStartDate, String activityEndDate, Set<Person> people) {
         this.id = id;
         this.name = name;
         this.location = location;
