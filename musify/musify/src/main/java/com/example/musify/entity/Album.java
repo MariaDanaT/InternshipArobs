@@ -41,6 +41,9 @@ public class Album {
     @JoinColumn(name = "band_id")
     private Band band;
 
-    //+ create methods for add song and remove song
-
+    public void addSongToAlbum(Song song) {
+        songs.add(song);
+        song.setAlbum(this);
+    }
+    
 }
