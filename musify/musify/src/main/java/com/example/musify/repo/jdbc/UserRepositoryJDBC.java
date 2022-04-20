@@ -1,4 +1,4 @@
-package com.example.musify.repo;
+package com.example.musify.repo.jdbc;
 
 import com.example.musify.entity.User;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

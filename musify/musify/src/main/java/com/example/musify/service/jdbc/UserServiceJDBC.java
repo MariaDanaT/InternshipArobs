@@ -5,7 +5,7 @@ import com.example.musify.dto.userdto.UserViewDTO;
 import com.example.musify.entity.User;
 import com.example.musify.exception.UnauthorizedException;
 import com.example.musify.mapper.UserMapper;
-import com.example.musify.repo.UserRepositoryJDBC;
+import com.example.musify.repo.jdbc.UserRepositoryJDBC;
 import com.example.musify.security.JwtUtils;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,8 +2,8 @@ package com.example.musify.controller;
 
 
 import com.example.musify.dto.userdto.RegisterUserDTO;
-import com.example.musify.dto.userdto.UserViewDTO;
 import com.example.musify.dto.userdto.UserLoginDTO;
+import com.example.musify.dto.userdto.UserViewDTO;
 import com.example.musify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserViewDTO> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+    public ResponseEntity<UserViewDTO> register(@RequestBody @Valid RegisterUserDTO registerUserDTO) {
         UserViewDTO userViewDTO = userService.register(registerUserDTO);
         return new ResponseEntity<>(userViewDTO, HttpStatus.OK);
     }
