@@ -22,9 +22,10 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<UserViewDTO> users(){
+    public List<UserViewDTO> users() {
         return userService.allUsers();
     }
+
     @PostMapping(value = "/login")
     public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
         String token = userService.login(userLoginDTO);
@@ -32,17 +33,19 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserViewDTO> register(@RequestBody @Valid RegisterUserDTO registerUserDTO) {
+    public ResponseEntity<UserViewDTO> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
         UserViewDTO userViewDTO = userService.register(registerUserDTO);
         return new ResponseEntity<>(userViewDTO, HttpStatus.OK);
     }
+
     @PutMapping("/delete/{id}")
-    public ResponseEntity<Optional<UserViewDTO>> inactivate(@RequestParam int id){
+    public ResponseEntity<Optional<UserViewDTO>> inactivate(@RequestParam int id) {
         Optional<UserViewDTO> optional = userService.inactivate(id);
-        return new ResponseEntity<>(optional,HttpStatus.OK);
+        return new ResponseEntity<>(optional, HttpStatus.OK);
     }
+
     @PutMapping("/update")
-    public ResponseEntity<UserViewDTO> update(@RequestBody UserViewDTO userViewDTO){
+    public ResponseEntity<UserViewDTO> update(@RequestBody UserViewDTO userViewDTO) {
         UserViewDTO userUpdated = userService.update(userViewDTO);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
