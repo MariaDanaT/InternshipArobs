@@ -14,7 +14,9 @@
 	<name>musify</name>
 	<description>Rip-off Spotify</description>
 	<properties>
+<!--		<java.version>11</java.version>-->
 		<java.version>11</java.version>
+		<hibernate.version>5.6.5.Final</hibernate.version>
 	</properties>
 	<dependencies>
 		<dependency>
