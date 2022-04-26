@@ -2,6 +2,8 @@ package com.example.musify.controller;
 
 import com.example.musify.dto.albumdto.AlbumDTO;
 import com.example.musify.dto.songdto.SongWithAlbumDTO;
+import com.example.musify.exception.UnauthorizedException;
+import com.example.musify.security.JwtUtils;
 import com.example.musify.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ public class AlbumController {
 
     @PostMapping
     public ResponseEntity<AlbumDTO> create(@RequestBody @Valid AlbumDTO albumDTO) {
+        if(!JwtUtils.getUserRoleFromSession().equals("admin"))
+            throw new UnauthorizedException("Only admins can add albums!");
         AlbumDTO albumToCreate = albumService.create(albumDTO);
         return new ResponseEntity<>(albumToCreate, HttpStatus.OK);
     }

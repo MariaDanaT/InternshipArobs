@@ -54,4 +54,9 @@ public class JwtUtils {
         Triple<Integer, String, String> auth = (Triple<Integer, String, String>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return auth.getLeft();
     }
+
+    public static String getUserRoleFromSession() {
+        Triple<Integer, String, String> auth = (Triple<Integer, String, String>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return auth.getRight();
+    }
 }

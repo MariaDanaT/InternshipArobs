@@ -1,6 +1,8 @@
 package com.example.musify.controller;
 
 import com.example.musify.dto.persondto.PersonDTO;
+import com.example.musify.exception.UnauthorizedException;
+import com.example.musify.security.JwtUtils;
 import com.example.musify.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,8 @@ public class PersonController {
 
     @PostMapping(value = "/persons")
     public ResponseEntity<PersonDTO> addPerson(@RequestBody PersonDTO personDTO) {
+        if(!JwtUtils.getUserRoleFromSession().equals("admin"))
+            throw new UnauthorizedException("Only admins can add persons (artists)!");
         return new ResponseEntity<>(personService.addPerson(personDTO), HttpStatus.OK);
     }
 
