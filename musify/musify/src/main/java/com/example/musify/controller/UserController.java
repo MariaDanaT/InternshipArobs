@@ -56,4 +56,10 @@ public class UserController {
         PlaylistDTO playlistAdded = userService.followNewPlaylist(playlistId);
         return new ResponseEntity<>(playlistAdded, HttpStatus.OK);
     }
+
+    @GetMapping("/playlistHasOrFollow")
+    public List<PlaylistDTO> getAllPlaylistsThatLoggedUserHasOrFollow(){
+        List<PlaylistDTO> playlists = userService.getAllPlaylistsThatLoggedUserHasOrFollow();
+        return playlists;
+    }
 }

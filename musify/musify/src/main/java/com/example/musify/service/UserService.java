@@ -18,6 +18,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -108,5 +109,15 @@ public class UserService {
         User user = userRepository.getById(loggedUserId);
         user.followNewPlaylist(playlist);
         return playlistMapper.playlistToPlaylistDTO(playlist);
+    }
+
+    public List<PlaylistDTO> getAllPlaylistsThatLoggedUserHasOrFollow() {
+        List<Playlist> playlists = new ArrayList<>();
+        User user = userRepository.getById(JwtUtils.getUserIdFromSession());
+        playlists.addAll(playlistRepository.findByUserIs(user));
+        playlists.addAll(user.getFollowedPlaylists());
+        return playlists.stream()
+                .map(playlistMapper::playlistToPlaylistDTO)
+                .collect(Collectors.toList());
     }
 }
