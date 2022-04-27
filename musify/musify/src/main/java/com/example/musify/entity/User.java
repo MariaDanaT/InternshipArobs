@@ -54,6 +54,16 @@ public class User {
         playlist.setUser(null);
     }
 
+    public void followNewPlaylist(Playlist playlist) {
+        followedPlaylists.add(playlist);
+        playlist.getUsers().add(this);
+    }
+
+    public void removePlaylistsFromFollowedPlaylistsTable(Playlist playlist) {
+        this.followedPlaylists.remove(playlist);
+        playlist.getUsers().remove(this);
+    }
+
     public User(Integer id, String firstName, String lastName, String email, String password, String country, String role, Boolean deleted) {
         this.id = id;
         this.firstName = firstName;

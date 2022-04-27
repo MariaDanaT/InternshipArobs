@@ -12,7 +12,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PlaylistService {
@@ -35,6 +37,7 @@ public class PlaylistService {
         }
         User user = userOptional.get();
         playlist.setUser(user);
+        user.addPlaylistToOwnerUser(playlist);
         return playlistMapper.playlistToPlaylistDTO(playlistRepository.save(playlist));
     }
 
@@ -63,10 +66,20 @@ public class PlaylistService {
             throw new ResourceNotFoundException("There is no playlist with id=" + id);
         }
         Playlist playlist = optionalPlaylist.get();
-        Integer idUser = JwtUtils.getUserIdFromSession();
-        if (!idUser.equals(playlist.getUser().getId())) {
+        User loggedUser = userRepository.getById(JwtUtils.getUserIdFromSession());
+        if (!loggedUser.getId().equals(playlist.getUser().getId())) {
             throw new UnauthorizedException("Only the owner can delete playlist!");
         }
+        loggedUser.removePlaylistFromOwnerUser(playlist);
+        playlist.getUsers()
+                .forEach(user -> user.removePlaylistsFromFollowedPlaylistsTable(playlist));
         playlistRepository.delete(playlist);
+    }
+
+    public List<PlaylistDTO> publicPlaylists() {
+        return playlistRepository.findByTypeLike("public")
+                .stream()
+                .map(playlistMapper::playlistToPlaylistDTO)
+                .collect(Collectors.toList());
     }
 }

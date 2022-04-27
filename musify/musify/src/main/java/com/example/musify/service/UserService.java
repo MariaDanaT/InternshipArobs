@@ -1,15 +1,19 @@
 package com.example.musify.service;
 
+import com.example.musify.dto.playlistdto.PlaylistDTO;
 import com.example.musify.dto.userdto.RegisterUserDTO;
 import com.example.musify.dto.userdto.UserLoginDTO;
 import com.example.musify.dto.userdto.UserViewDTO;
+import com.example.musify.entity.Playlist;
 import com.example.musify.entity.User;
 import com.example.musify.exception.UnauthorizedException;
+import com.example.musify.mapper.PlaylistMapper;
 import com.example.musify.mapper.UserMapper;
+import com.example.musify.repo.springdata.PlaylistRepository;
 import com.example.musify.repo.springdata.UserRepository;
 import com.example.musify.security.JwtUtils;
+import lombok.AllArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +23,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PlaylistRepository playlistRepository;
+    private final PlaylistMapper playlistMapper;
 
-    @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     @Transactional
     public UserViewDTO register(RegisterUserDTO registerUserDTO) {
@@ -85,7 +87,26 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserViewDTO> allUsers() {
         return userRepository.findAll().stream()
-                .map(user -> userMapper.userDTOFromUser(user))
+                .map(userMapper::userDTOFromUser)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PlaylistDTO followNewPlaylist(Integer playlistId) {
+        Optional<Playlist> findPlaylistByIdOptional = playlistRepository.findById(playlistId);
+        if (findPlaylistByIdOptional.isEmpty()) {
+            throw new ResourceNotFoundException("There is no playlist with the id = " + playlistId);
+        }
+        Playlist playlist = findPlaylistByIdOptional.get();
+        if (!playlist.getType().equals("public")) {
+            throw new UnauthorizedException("This playlist can not be followed!");
+        }
+        Integer loggedUserId = JwtUtils.getUserIdFromSession();
+        if (playlist.getUser().getId().equals(loggedUserId)) {
+            throw new UnauthorizedException("This playlist is yours, you can not add it as followed!");
+        }
+        User user = userRepository.getById(loggedUserId);
+        user.followNewPlaylist(playlist);
+        return playlistMapper.playlistToPlaylistDTO(playlist);
     }
 }

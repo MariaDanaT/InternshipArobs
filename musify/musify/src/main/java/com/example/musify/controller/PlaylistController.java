@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/playlists")
 public class PlaylistController {
@@ -33,5 +35,10 @@ public class PlaylistController {
     public ResponseEntity<String> delete(@PathVariable("id") Integer id) {
         playlistService.delete(id);
         return new ResponseEntity<>("Deleted with success!", HttpStatus.OK);
+    }
+
+    @GetMapping
+    public List<PlaylistDTO> publicPlaylists(){
+        return playlistService.publicPlaylists();
     }
 }

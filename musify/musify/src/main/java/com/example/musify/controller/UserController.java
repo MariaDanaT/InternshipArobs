@@ -1,6 +1,7 @@
 package com.example.musify.controller;
 
 
+import com.example.musify.dto.playlistdto.PlaylistDTO;
 import com.example.musify.dto.userdto.RegisterUserDTO;
 import com.example.musify.dto.userdto.UserLoginDTO;
 import com.example.musify.dto.userdto.UserViewDTO;
@@ -48,5 +49,11 @@ public class UserController {
     public ResponseEntity<UserViewDTO> update(@RequestBody UserViewDTO userViewDTO) {
         UserViewDTO userUpdated = userService.update(userViewDTO);
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
+    }
+
+    @PostMapping("/follow/{playlistId}")
+    public ResponseEntity<PlaylistDTO> followNewPlaylist(@RequestParam("playlistId") Integer playlistId){
+        PlaylistDTO playlistAdded = userService.followNewPlaylist(playlistId);
+        return new ResponseEntity<>(playlistAdded, HttpStatus.OK);
     }
 }
