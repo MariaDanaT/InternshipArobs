@@ -19,6 +19,8 @@ public class Playlist {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(name = "name")
+    private String name;
     @Column(name = "type")
     private String type;
     @Column(name = "created_date")

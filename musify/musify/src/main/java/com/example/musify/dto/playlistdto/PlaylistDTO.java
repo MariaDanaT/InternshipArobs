@@ -13,6 +13,7 @@ import java.sql.Date;
 @AllArgsConstructor
 public class PlaylistDTO {
     private Integer id;
+    private String name;
     private String type;
     private Date createdDate;
     private Date lastUpdateDate;
