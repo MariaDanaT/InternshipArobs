@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,6 +136,42 @@ public class PlaylistService {
                 .map(songMapper::songToSongDTO)
                 .collect(Collectors.toList());
 
+    }
+
+    @Transactional
+    public List<SongDTO> removeSongFromPlaylist(Integer idPlaylist, Integer idSong) {
+        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
+        if (playlistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
+        }
+        Playlist playlist = playlistOptional.get();
+        Optional<Song> songOptional = songRepository.findAll(idPlaylist, idSong);
+        if (songOptional.isEmpty()) {
+            throw new ResourceNotFoundException("This song doesn't exist in the playlist!");
+        }
+        Song song = songOptional.get();
+        PlaylistsSongs playlistSong = playlistsSongsRepository.findBySongFromPlaylistAndPlaylist(song, playlist);
+        playlistsSongsRepository.delete(playlistSong);
+        playlist.setLastUpdateDate(Date.valueOf(java.time.LocalDate.now()));
+        return songRepository.findAll(idPlaylist)
+                .stream()
+                .map(songMapper::songToSongDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void reindexSongsForPlaylist(Integer idPlaylist) {
+        AtomicReference<Integer> count = new AtomicReference<>(0);
+        Playlist playlist = playlistRepository.getById(idPlaylist);
+        Set<PlaylistsSongs> playlistsSongsSet = playlist.getPlaylistsSongs();
+        for (PlaylistsSongs playlistSong : playlistsSongsSet
+        ) {
+            if (playlistSong.getPlaylist().getId().equals(idPlaylist)) {
+                count.set(count.get() + 1);
+                playlistSong.setOrderNumber(count.get());
+            }
+        }
+        playlist.setPlaylistsSongs(playlistsSongsSet);
     }
 
     private PlaylistsSongs createPlaylistsSongsWithGivenPlaylistAndSong(Playlist playlist, Song song) {

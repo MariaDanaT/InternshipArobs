@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SongRepository extends JpaRepository<Song, Integer> {
@@ -15,4 +16,8 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
     @Query("SELECT s FROM Song s JOIN s.playlistsSongs ps" +
             " WHERE ps.playlist.id =:idPlaylist")
     List<Song> findAll(@Param("idPlaylist") Integer idPlaylist);
+
+    @Query("SELECT s FROM Song s JOIN s.playlistsSongs ps" +
+            " WHERE ps.playlist.id =:idPlaylist AND s.id=:idSong")
+    Optional<Song> findAll(@Param("idPlaylist") Integer idPlaylist, @Param("idSong") Integer idSong);
 }

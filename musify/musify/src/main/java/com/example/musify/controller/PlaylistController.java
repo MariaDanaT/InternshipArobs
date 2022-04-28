@@ -55,4 +55,11 @@ public class PlaylistController {
         List<SongDTO> songsFromPlaylist = playlistService.songsFromPlaylist(idPlaylist);
         return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{idPlaylist}/{idSong}")
+    public ResponseEntity<List<SongDTO>> removeSongFromPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
+        List<SongDTO> songsFromPlaylist = playlistService.removeSongFromPlaylist(idPlaylist, idSong);
+        playlistService.reindexSongsForPlaylist(idPlaylist);
+        return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
+    }
 }
