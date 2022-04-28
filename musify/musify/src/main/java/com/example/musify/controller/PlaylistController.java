@@ -1,6 +1,8 @@
 package com.example.musify.controller;
 
 import com.example.musify.dto.playlistdto.PlaylistDTO;
+import com.example.musify.dto.playlistdto.PlaylistWithSongsTitleDTO;
+import com.example.musify.dto.songdto.SongDTO;
 import com.example.musify.security.JwtUtils;
 import com.example.musify.service.PlaylistService;
 import org.springframework.http.HttpStatus;
@@ -38,7 +40,19 @@ public class PlaylistController {
     }
 
     @GetMapping
-    public List<PlaylistDTO> publicPlaylists(){
+    public List<PlaylistDTO> publicPlaylists() {
         return playlistService.publicPlaylists();
+    }
+
+    @PostMapping("/{idPlaylist}/{idSong}")
+    public PlaylistWithSongsTitleDTO addSongToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
+        PlaylistWithSongsTitleDTO playlistWithSongs = playlistService.addSongToPlaylist(idPlaylist, idSong);
+        return playlistWithSongs;
+    }
+
+    @GetMapping("/songs/{idPlaylist}")
+    public ResponseEntity<List<SongDTO>> songsFromPlaylist(@RequestParam("idPlaylist") Integer idPlaylist) {
+        List<SongDTO> songsFromPlaylist = playlistService.songsFromPlaylist(idPlaylist);
+        return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
     }
 }

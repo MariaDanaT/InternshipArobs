@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ControllerAdvice
-public class UserExceptionController extends ResponseEntityExceptionHandler {
+public class ExceptionController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = UnauthorizedException.class)
     public ResponseEntity<Object> exception(UnauthorizedException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
@@ -24,6 +24,11 @@ public class UserExceptionController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
     public ResponseEntity<Object> exception(ResourceNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = DuplicateException.class)
+    public ResponseEntity<Object> exception(DuplicateException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 

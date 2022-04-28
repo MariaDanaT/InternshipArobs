@@ -1,6 +1,5 @@
 package com.example.musify.dto.songdto;
 
-import com.example.musify.entity.Album;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

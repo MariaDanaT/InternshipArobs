@@ -111,6 +111,7 @@ public class UserService {
         return playlistMapper.playlistToPlaylistDTO(playlist);
     }
 
+    @Transactional
     public List<PlaylistDTO> getAllPlaylistsThatLoggedUserHasOrFollow() {
         List<Playlist> playlists = new ArrayList<>();
         User user = userRepository.getById(JwtUtils.getUserIdFromSession());
