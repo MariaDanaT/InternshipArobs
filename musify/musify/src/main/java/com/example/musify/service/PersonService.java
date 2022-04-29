@@ -1,10 +1,12 @@
 package com.example.musify.service;
 
+import com.example.musify.dto.albumdto.AlbumDTO;
 import com.example.musify.dto.persondto.PersonDTO;
 import com.example.musify.entity.Person;
+import com.example.musify.mapper.AlbumMapper;
 import com.example.musify.mapper.PersonMapper;
 import com.example.musify.repo.springdata.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,16 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Service
 public class PersonService {
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
-
-    @Autowired
-    public PersonService(PersonRepository personRepository, PersonMapper personMapper) {
-        this.personRepository = personRepository;
-        this.personMapper = personMapper;
-    }
+    private final AlbumMapper albumMapper;
 
     @Transactional
     public List<PersonDTO> getPersons() {
@@ -70,5 +68,19 @@ public class PersonService {
         }
         Person person = optional.get();
         personRepository.delete(person);
+    }
+
+    @Transactional
+    public List<AlbumDTO> loadAllAlbums(Integer idPerson) {
+        Optional<Person> optional = personRepository.findById(idPerson);
+        if (!optional.isPresent()) {
+            throw new ResourceNotFoundException("There is no person with id=" + idPerson);
+        }
+        Person person = optional.get();
+
+        return person.getAlbums()
+                .stream()
+                .map(albumMapper::albumToAlbumDTO)
+                .collect(Collectors.toList());
     }
 }

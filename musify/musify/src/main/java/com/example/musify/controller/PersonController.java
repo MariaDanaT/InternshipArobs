@@ -1,5 +1,6 @@
 package com.example.musify.controller;
 
+import com.example.musify.dto.albumdto.AlbumDTO;
 import com.example.musify.dto.persondto.PersonDTO;
 import com.example.musify.exception.UnauthorizedException;
 import com.example.musify.security.JwtUtils;
@@ -47,5 +48,10 @@ public class PersonController {
     public ResponseEntity<String> deletePerson(@PathVariable int id) {
         personService.deletePerson(id);
         return new ResponseEntity<>("Deleted with success!", HttpStatus.OK);
+    }
+    @GetMapping("/persons/albums/{idPerson}")
+    public ResponseEntity<List<AlbumDTO>> loadAllAlbums(@PathVariable("idPerson") Integer idPerson){
+        List<AlbumDTO> albumsForPerson = personService.loadAllAlbums(idPerson);
+        return new ResponseEntity<>(albumsForPerson,HttpStatus.OK);
     }
 }
