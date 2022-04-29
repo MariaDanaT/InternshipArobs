@@ -3,6 +3,7 @@ package com.example.musify.controller;
 import com.example.musify.dto.playlistdto.PlaylistDTO;
 import com.example.musify.dto.playlistdto.PlaylistWithSongsTitleDTO;
 import com.example.musify.dto.songdto.SongDTO;
+import com.example.musify.entity.Song;
 import com.example.musify.security.JwtUtils;
 import com.example.musify.service.PlaylistService;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,12 @@ public class PlaylistController {
     public PlaylistWithSongsTitleDTO addSongToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
         PlaylistWithSongsTitleDTO playlistWithSongs = playlistService.addSongToPlaylist(idPlaylist, idSong);
         return playlistWithSongs;
+    }
+
+    @PostMapping("/{idPlaylist}/album/{idAlbum}")
+    public ResponseEntity<List<SongDTO>> addAlbumToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idAlbum") Integer idAlbum) {
+        List<SongDTO> songsFromPlaylist = playlistService.addAlbumToPlaylist(idPlaylist,idAlbum);
+        return new ResponseEntity<>(songsFromPlaylist,HttpStatus.OK);
     }
 
     @GetMapping("/songs/{idPlaylist}")

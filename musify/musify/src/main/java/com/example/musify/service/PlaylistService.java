@@ -3,18 +3,12 @@ package com.example.musify.service;
 import com.example.musify.dto.playlistdto.PlaylistDTO;
 import com.example.musify.dto.playlistdto.PlaylistWithSongsTitleDTO;
 import com.example.musify.dto.songdto.SongDTO;
-import com.example.musify.entity.Playlist;
-import com.example.musify.entity.PlaylistsSongs;
-import com.example.musify.entity.Song;
-import com.example.musify.entity.User;
+import com.example.musify.entity.*;
 import com.example.musify.exception.DuplicateException;
 import com.example.musify.exception.UnauthorizedException;
 import com.example.musify.mapper.PlaylistMapper;
 import com.example.musify.mapper.SongMapper;
-import com.example.musify.repo.springdata.PlaylistRepository;
-import com.example.musify.repo.springdata.PlaylistsSongsRepository;
-import com.example.musify.repo.springdata.SongRepository;
-import com.example.musify.repo.springdata.UserRepository;
+import com.example.musify.repo.springdata.*;
 import com.example.musify.security.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -22,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -38,6 +29,7 @@ public class PlaylistService {
     private final PlaylistsSongsRepository playlistsSongsRepository;
     private final SongRepository songRepository;
     private final SongMapper songMapper;
+    private final AlbumRepository albumRepository;
 
     @Transactional
     public PlaylistDTO create(PlaylistDTO playlistDTO, Integer idUser) {
@@ -109,7 +101,8 @@ public class PlaylistService {
         if (songOptional.isEmpty()) {
             throw new ResourceNotFoundException("There is no song with id = " + idSong);
         }
-        PlaylistsSongs playlistsSongsToAdd = createPlaylistsSongsWithGivenPlaylistAndSong(playlist, songOptional.get());
+        PlaylistsSongs playlistsSongs = new PlaylistsSongs();
+        PlaylistsSongs playlistsSongsToAdd = createPlaylistsSongsWithGivenPlaylistAndSong(playlist, songOptional.get(), playlistsSongs);
         List<Integer> idSongsForPlaylist = new ArrayList<>();
         songRepository.findAll(playlist.getId()).forEach(song -> idSongsForPlaylist.add(song.getId()));
         if (idSongsForPlaylist.contains(idSong)) {
@@ -120,6 +113,39 @@ public class PlaylistService {
         List<String> songsTitle = new ArrayList<>();
         idSongsForPlaylist.forEach(songId -> songsTitle.add(songRepository.getById(songId).getTitle()));
         return playlistMapper.playlistWithTheirSongsTitle(playlist.getId(), songsTitle);
+    }
+
+    @Transactional
+    public List<SongDTO> addAlbumToPlaylist(Integer idPlaylist, Integer idAlbum) {
+        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
+        if (playlistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
+        }
+        Playlist playlist = playlistOptional.get();
+        if (!playlist.getUser().getId().equals(JwtUtils.getUserIdFromSession())) {
+            throw new UnauthorizedException("Only the owner can add song to the playlist!");
+        }
+        Optional<Album> albumOptional = albumRepository.findById(idAlbum);
+        if (albumOptional.isEmpty()) {
+            throw new ResourceNotFoundException("There is no album with id = " + idAlbum);
+        }
+        Album album = albumOptional.get();
+        List<Song> songsExistsInPlaylist = songRepository.findAll(idPlaylist);
+        List<Song> songsFromAlbum = album.getSongs().stream()
+                .sorted(Comparator.comparing(Song::getId))
+                .collect(Collectors.toList());
+        songsFromAlbum.forEach(song -> {
+            if (!songsExistsInPlaylist.contains(song)) {
+                PlaylistsSongs playlistsSongs = new PlaylistsSongs();
+                PlaylistsSongs playlistsSongsToAdd = createPlaylistsSongsWithGivenPlaylistAndSong(playlist, song, playlistsSongs);
+                playlistsSongsRepository.save(playlistsSongsToAdd);
+                songsExistsInPlaylist.add(song);
+            }
+        });
+        return songsExistsInPlaylist
+                .stream()
+                .map(song -> songMapper.songToSongDTO(song))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -174,11 +200,8 @@ public class PlaylistService {
         playlist.setPlaylistsSongs(playlistsSongsSet);
     }
 
-    private PlaylistsSongs createPlaylistsSongsWithGivenPlaylistAndSong(Playlist playlist, Song song) {
-        PlaylistsSongs playlistsSongs = new PlaylistsSongs();
-
+    private PlaylistsSongs createPlaylistsSongsWithGivenPlaylistAndSong(Playlist playlist, Song song, PlaylistsSongs playlistsSongs) {
         playlist.setLastUpdateDate(Date.valueOf(java.time.LocalDate.now()));
-
         playlistsSongs.setPlaylist(playlist);
         playlistsSongs.setSongFromPlaylist(song);
         int count = Math.toIntExact(playlistsSongsRepository.countByPlaylist(playlist));
