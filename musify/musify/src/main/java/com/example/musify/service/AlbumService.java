@@ -1,6 +1,7 @@
 package com.example.musify.service;
 
 import com.example.musify.dto.albumdto.AlbumDTO;
+import com.example.musify.dto.songdto.SongDTO;
 import com.example.musify.dto.songdto.SongWithAlbumDTO;
 import com.example.musify.entity.Album;
 import com.example.musify.entity.Song;
@@ -13,6 +14,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,6 +77,21 @@ public class AlbumService {
         return songRepository.findAll()
                 .stream()
                 .map(song1 -> songMapper.songToSongWithAlbumDTO(song1))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<SongDTO> allSongsForAlbum(Integer idAlbum) {
+        Optional<Album> albumOptional = albumRepository.findById(idAlbum);
+        if (albumOptional.isEmpty()) {
+            throw new ResourceNotFoundException("There is no album with id = " + idAlbum);
+        }
+        Album album = albumOptional.get();
+
+        return album.getSongs()
+                .stream()
+                .sorted(Comparator.comparing(Song::getId))
+                .map(songMapper::songToSongDTO)
                 .collect(Collectors.toList());
     }
 }

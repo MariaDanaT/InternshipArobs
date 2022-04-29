@@ -1,6 +1,7 @@
 package com.example.musify.controller;
 
 import com.example.musify.dto.albumdto.AlbumDTO;
+import com.example.musify.dto.songdto.SongDTO;
 import com.example.musify.dto.songdto.SongWithAlbumDTO;
 import com.example.musify.exception.UnauthorizedException;
 import com.example.musify.security.JwtUtils;
@@ -45,4 +46,8 @@ public class AlbumController {
         return new ResponseEntity<>(albumService.addSongToAlbum(idSong, idAlbum), HttpStatus.OK);
     }
 
+    @GetMapping("/songs/{idAlbum}")
+    public ResponseEntity<List<SongDTO>> allSongsForAlbum(@PathVariable("idAlbum") Integer idAlbum){
+        return new ResponseEntity<>(albumService.allSongsForAlbum(idAlbum), HttpStatus.OK);
+    }
 }
