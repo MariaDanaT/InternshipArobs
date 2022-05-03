@@ -3,7 +3,6 @@ package com.example.musify.controller;
 import com.example.musify.dto.playlistdto.PlaylistDTO;
 import com.example.musify.dto.playlistdto.PlaylistWithSongsTitleDTO;
 import com.example.musify.dto.songdto.SongDTO;
-import com.example.musify.entity.Song;
 import com.example.musify.security.JwtUtils;
 import com.example.musify.service.PlaylistService;
 import org.springframework.http.HttpStatus;
@@ -53,8 +52,8 @@ public class PlaylistController {
 
     @PostMapping("/{idPlaylist}/album/{idAlbum}")
     public ResponseEntity<List<SongDTO>> addAlbumToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idAlbum") Integer idAlbum) {
-        List<SongDTO> songsFromPlaylist = playlistService.addAlbumToPlaylist(idPlaylist,idAlbum);
-        return new ResponseEntity<>(songsFromPlaylist,HttpStatus.OK);
+        List<SongDTO> songsFromPlaylist = playlistService.addAlbumToPlaylist(idPlaylist, idAlbum);
+        return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
     }
 
     @GetMapping("/songs/{idPlaylist}")
@@ -68,5 +67,12 @@ public class PlaylistController {
         List<SongDTO> songsFromPlaylist = playlistService.removeSongFromPlaylist(idPlaylist, idSong);
         playlistService.reindexSongsForPlaylist(idPlaylist);
         return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
+    }
+
+    @PutMapping("/changeOrderSongInPlaylist/{idPlaylist}/{idSong}/{newPosition}")
+    public List<SongDTO> changeOrderSongInPlaylist(@PathVariable("idPlaylist") Integer idPlaylist, @PathVariable("idSong") Integer idSong, @PathVariable("newPosition") Integer newPosition) {
+        playlistService.changeOrderSongInPlaylist(idPlaylist, idSong, newPosition);
+        List<SongDTO> songsFromPlaylist = playlistService.songsFromPlaylist(idPlaylist);
+        return songsFromPlaylist;
     }
 }

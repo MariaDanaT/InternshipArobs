@@ -144,7 +144,7 @@ public class PlaylistService {
         });
         return songsExistsInPlaylist
                 .stream()
-                .map(song -> songMapper.songToSongDTO(song))
+                .map(songMapper::songToSongDTO)
                 .collect(Collectors.toList());
     }
 
@@ -186,18 +186,55 @@ public class PlaylistService {
     }
 
     @Transactional
+    public void changeOrderSongInPlaylist(Integer idPlaylist, Integer idSong, Integer newPosition) {
+        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
+        if (playlistOptional.isEmpty()) {
+            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
+        }
+        Optional<Song> songOptional = songRepository.findAll(idPlaylist, idSong);
+        if (songOptional.isEmpty()) {
+            throw new ResourceNotFoundException("This song doesn't exist in the playlist!");
+        }
+        Song song = songOptional.get();
+        Playlist playlist = playlistOptional.get();
+        List<Song> songsFromPlaylist = playlistsSongsRepository.findAll(idPlaylist);
+        int oldPosition = songsFromPlaylist.indexOf(song);
+        LinkedList<Song> songsLinkedList = new LinkedList<>(songsFromPlaylist);
+        if (oldPosition < newPosition) {
+            songsLinkedList.add(newPosition, song);
+            songsLinkedList.remove(oldPosition);
+        } else {
+            songsLinkedList.add(newPosition - 1, song);
+            songsLinkedList.remove(oldPosition + 1);
+        }
+        List<PlaylistsSongs> psList = playlist.getPlaylistsSongs()
+                .stream()
+                .sorted(Comparator.comparing(PlaylistsSongs::getOrderNumber))
+                .collect(Collectors.toList());
+        for (PlaylistsSongs ps : psList
+        ) {
+            ps.setSongFromPlaylist(songsLinkedList.peek());
+            songsLinkedList.remove();
+        }
+    }
+
+
+    @Transactional
     public void reindexSongsForPlaylist(Integer idPlaylist) {
         AtomicReference<Integer> count = new AtomicReference<>(0);
         Playlist playlist = playlistRepository.getById(idPlaylist);
-        Set<PlaylistsSongs> playlistsSongsSet = playlist.getPlaylistsSongs();
-        for (PlaylistsSongs playlistSong : playlistsSongsSet
+        List<PlaylistsSongs> playlistsSongsList = playlist.getPlaylistsSongs()
+                .stream()
+                .sorted(Comparator.comparing(PlaylistsSongs::getId))
+                .collect(Collectors.toList());
+        for (PlaylistsSongs playlistSong : playlistsSongsList
         ) {
             if (playlistSong.getPlaylist().getId().equals(idPlaylist)) {
                 count.set(count.get() + 1);
                 playlistSong.setOrderNumber(count.get());
             }
         }
-        playlist.setPlaylistsSongs(playlistsSongsSet);
+        playlist.setPlaylistsSongs(new HashSet<>(playlistsSongsList));
     }
 
     private PlaylistsSongs createPlaylistsSongsWithGivenPlaylistAndSong(Playlist playlist, Song song, PlaylistsSongs playlistsSongs) {
