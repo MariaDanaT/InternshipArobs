@@ -57,16 +57,14 @@ public class UserService {
 
     @Transactional
     public Optional<UserViewDTO> inactivate(int idUser) {
-        Optional<User> optional = userRepository.findById(idUser);
-        User user = Checker.getUserIfExists(optional, idUser);
+        User user = Checker.getUserIfExists(userRepository.findById(idUser), idUser);
         user.setDeleted(true);
         return Optional.ofNullable(userMapper.userDTOFromUser(user));
     }
 
     @Transactional
     public UserViewDTO update(UserViewDTO userViewDTO) {
-        Optional<User> optional = userRepository.findById(userViewDTO.getId());
-        User updateUser = Checker.getUserIfExists(optional, userViewDTO.getId());
+        User updateUser = Checker.getUserIfExists(userRepository.findById(userViewDTO.getId()), userViewDTO.getId());
         userMapper.mergeUserAndUserViewDTO(updateUser,userViewDTO);
         return userMapper.userDTOFromUser(updateUser);
     }
@@ -80,8 +78,7 @@ public class UserService {
 
     @Transactional
     public PlaylistDTO followNewPlaylist(Integer idPlaylist) {
-        Optional<Playlist> findPlaylistByIdOptional = playlistRepository.findById(idPlaylist);
-        Playlist playlist = Checker.getPlaylistIfExists(findPlaylistByIdOptional, idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(idPlaylist), idPlaylist);
         if (!playlist.getType().equals("public")) {
             throw new UnauthorizedException("This playlist can not be followed!");
         }

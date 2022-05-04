@@ -30,8 +30,7 @@ public class SongService {
 
     @Transactional
     public SongDTO update(SongDTO songDTO) {
-        Optional<Song> optionalSong = songRepository.findById(songDTO.getId());
-        Song song = Checker.getSongIfExists(optionalSong, songDTO.getId());
+        Song song = Checker.getSongIfExists(songRepository.findById(songDTO.getId()), songDTO.getId());
         songMapper.mergeSongAndSongDTO(song,songDTO);
         return songMapper.songToSongDTO(song);
     }

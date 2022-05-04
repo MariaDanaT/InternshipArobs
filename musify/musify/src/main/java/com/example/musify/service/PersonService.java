@@ -31,12 +31,8 @@ public class PersonService {
 
     @Transactional
     public Optional<PersonDTO> getPersonById(int id) {
-        Optional<PersonDTO> artistDTO = Optional.empty();
-        Optional<Person> artist = personRepository.findById(id);
-        if (artist.isPresent()) {
-            artistDTO = Optional.of(personMapper.personToPersonDTO(artist.get()));
-        }
-        return artistDTO;
+        Person person = Checker.getPersonIfExists(personRepository.findById(id), id);
+        return Optional.of(personMapper.personToPersonDTO(person));
     }
 
     @Transactional
@@ -47,8 +43,7 @@ public class PersonService {
 
     @Transactional
     public Optional<PersonDTO> updatePerson(Integer id, PersonDTO personDTO) {
-        Optional<Person> optional = personRepository.findById(id);
-        Person person = Checker.getPersonIfExists(optional, id);
+        Person person = Checker.getPersonIfExists(personRepository.findById(id), id);
         personMapper.mergePersonAndPersonDTO(person, personDTO);
         return Optional.of(personDTO);
     }
@@ -56,8 +51,7 @@ public class PersonService {
 
     @Transactional
     public List<AlbumDTO> loadAllAlbums(Integer idPerson) {
-        Optional<Person> optional = personRepository.findById(idPerson);
-        Person person = Checker.getPersonIfExists(optional, idPerson);
+        Person person = Checker.getPersonIfExists(personRepository.findById(idPerson), idPerson);
 
         return person.getAlbums()
                 .stream()

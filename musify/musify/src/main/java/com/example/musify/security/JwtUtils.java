@@ -51,12 +51,12 @@ public class JwtUtils {
     }
 
     public static Integer getUserIdFromSession() {
-        Triple<Integer, String, String> auth = (Triple<Integer, String, String>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return auth.getLeft();
+        return (Integer) ((Triple<?, ?, ?>) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getLeft();
     }
 
     public static String getUserRoleFromSession() {
-        Triple<Integer, String, String> auth = (Triple<Integer, String, String>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return auth.getRight();
+//        Triple<Integer, String, String> auth = (Triple<Integer, String, String>) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return String.valueOf(((Triple<?, ?, ?>) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRight());
+
     }
 }

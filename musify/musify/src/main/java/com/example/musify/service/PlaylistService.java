@@ -34,8 +34,7 @@ public class PlaylistService {
     @Transactional
     public PlaylistDTO create(PlaylistDTO playlistDTO, Integer idUser) {
         Playlist playlist = playlistMapper.playlistFromPlaylistDTO(playlistDTO);
-        Optional<User> userOptional = userRepository.findById(idUser);
-        User user = Checker.getUserIfExists(userOptional, idUser);
+        User user = Checker.getUserIfExists(userRepository.findById(idUser), idUser);
         playlist.setUser(user);
         user.addPlaylistToOwnerUser(playlist);
         return playlistMapper.playlistToPlaylistDTO(playlistRepository.save(playlist));
@@ -43,20 +42,18 @@ public class PlaylistService {
 
     @Transactional
     public PlaylistDTO update(PlaylistDTO playlistDTO) {
-        Optional<Playlist> playlistOptional = playlistRepository.findById(playlistDTO.getId());
         Integer idUser = JwtUtils.getUserIdFromSession();
-        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, playlistDTO.getId());
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(playlistDTO.getId()), playlistDTO.getId());
         if (!idUser.equals(playlist.getUser().getId())) {
             throw new UnauthorizedException("Only the owner can edit playlist!");
         }
-        playlistMapper.mergePlaylistAndPlaylistDTO(playlist,playlistDTO);
+        playlistMapper.mergePlaylistAndPlaylistDTO(playlist, playlistDTO);
         return playlistMapper.playlistToPlaylistDTO(playlist);
     }
 
     @Transactional
     public PlaylistDTO delete(Integer idPlaylist) {
-        Optional<Playlist> optionalPlaylist = playlistRepository.findById(idPlaylist);
-        Playlist playlist = Checker.getPlaylistIfExists(optionalPlaylist, idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(idPlaylist), idPlaylist);
         User loggedUser = userRepository.getById(JwtUtils.getUserIdFromSession());
         if (!loggedUser.getId().equals(playlist.getUser().getId())) {
             throw new UnauthorizedException("Only the owner can delete playlist!");
@@ -78,14 +75,12 @@ public class PlaylistService {
 
     @Transactional
     public PlaylistWithSongsTitleDTO addSongToPlaylist(Integer idPlaylist, Integer idSong) {
-        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(idPlaylist), idPlaylist);
         if (!playlist.getUser().getId().equals(JwtUtils.getUserIdFromSession())) {
             throw new UnauthorizedException("Only the owner can add song to the playlist!");
         }
-        Optional<Song> songOptional = songRepository.findById(idSong);
         PlaylistsSongs playlistsSongs = new PlaylistsSongs();
-        Song song = Checker.getSongIfExists(songOptional, idSong);
+        Song song = Checker.getSongIfExists(songRepository.findById(idSong), idSong);
         PlaylistsSongs playlistsSongsToAdd = createPlaylistsSongsWithGivenPlaylistAndSong(playlist, song, playlistsSongs);
         List<Integer> idSongsForPlaylist = new ArrayList<>();
         songRepository.findAll(playlist.getId()).forEach(s -> idSongsForPlaylist.add(s.getId()));
@@ -101,13 +96,11 @@ public class PlaylistService {
 
     @Transactional
     public List<SongDTO> addAlbumToPlaylist(Integer idPlaylist, Integer idAlbum) {
-        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(idPlaylist), idPlaylist);
         if (!playlist.getUser().getId().equals(JwtUtils.getUserIdFromSession())) {
             throw new UnauthorizedException("Only the owner can add song to the playlist!");
         }
-        Optional<Album> albumOptional = albumRepository.findById(idAlbum);
-        Album album = Checker.getAlbumIfExists(albumOptional, idAlbum);
+        Album album = Checker.getAlbumIfExists(albumRepository.findById(idAlbum), idAlbum);
         List<Song> songsExistsInPlaylist = songRepository.findAll(idPlaylist);
         List<Song> songsFromAlbum = album.getSongs().stream()
                 .sorted(Comparator.comparing(Song::getId))
@@ -128,8 +121,7 @@ public class PlaylistService {
 
     @Transactional
     public List<SongDTO> songsFromPlaylist(Integer idPlaylist) {
-        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists( playlistRepository.findById(idPlaylist), idPlaylist);
         if (!playlist.getType().equals("public")) {
             throw new UnauthorizedException("Can not show songs!");
         }
@@ -142,11 +134,8 @@ public class PlaylistService {
 
     @Transactional
     public List<SongDTO> removeSongFromPlaylist(Integer idPlaylist, Integer idSong) {
-        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
-        Optional<Song> songOptional = songRepository.findAll(idPlaylist, idSong);
-
-        Song song = Checker.getSongIfExistsInPlaylist(songOptional);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(idPlaylist), idPlaylist);
+        Song song = Checker.getSongIfExistsInPlaylist(songRepository.findAll(idPlaylist, idSong));
         PlaylistsSongs playlistSong = playlistsSongsRepository.findBySongFromPlaylistAndPlaylist(song, playlist);
         playlistsSongsRepository.delete(playlistSong);
         playlist.setLastUpdateDate(Date.valueOf(java.time.LocalDate.now()));
@@ -158,10 +147,8 @@ public class PlaylistService {
 
     @Transactional
     public void changeOrderSongInPlaylist(Integer idPlaylist, Integer idSong, Integer newPosition) {
-        Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        Optional<Song> songOptional = songRepository.findAll(idPlaylist, idSong);
-        Song song = Checker.getSongIfExistsInPlaylist(songOptional);
-        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistRepository.findById(idPlaylist), idPlaylist);
+        Song song = Checker.getSongIfExistsInPlaylist(songRepository.findAll(idPlaylist, idSong));
         List<Song> songsFromPlaylist = playlistsSongsRepository.findAll(idPlaylist);
         int oldPosition = songsFromPlaylist.indexOf(song);
         LinkedList<Song> songsLinkedList = new LinkedList<>(songsFromPlaylist);

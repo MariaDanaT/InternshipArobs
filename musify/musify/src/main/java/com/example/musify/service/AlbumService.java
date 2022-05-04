@@ -47,8 +47,7 @@ public class AlbumService {
 
     @Transactional
     public AlbumDTO update(AlbumDTO albumDTO) {
-        Optional<Album> optionalAlbum = albumRepository.findById(albumDTO.getId());
-        Album album = Checker.getAlbumIfExists(optionalAlbum, albumDTO.getId());
+        Album album = Checker.getAlbumIfExists(albumRepository.findById(albumDTO.getId()), albumDTO.getId());
         albumMapper.mergeAlbumAndAlbumDTO(album, albumDTO);
 
         return albumMapper.albumToAlbumDTO(album);
@@ -56,10 +55,8 @@ public class AlbumService {
 
     @Transactional
     public List<SongWithAlbumDTO> addSongToAlbum(Integer idSong, Integer idAlbum) {
-        Optional<Song> optionalSong = songRepository.findById(idSong);
-        Optional<Album> albumOptional = albumRepository.findById(idAlbum);
-        Song song = Checker.getSongIfExists(optionalSong, idSong);
-        Album album = Checker.getAlbumIfExists(albumOptional, idAlbum);
+        Song song = Checker.getSongIfExists(songRepository.findById(idSong), idSong);
+        Album album = Checker.getAlbumIfExists(albumRepository.findById(idAlbum), idAlbum);
         song.setAlbum(album);
         album.addSongToAlbum(song);
         return songRepository.findAll()
@@ -70,8 +67,7 @@ public class AlbumService {
 
     @Transactional
     public List<SongDTO> allSongsForAlbum(Integer idAlbum) {
-        Optional<Album> albumOptional = albumRepository.findById(idAlbum);
-        Album album = Checker.getAlbumIfExists(albumOptional, idAlbum);
+        Album album = Checker.getAlbumIfExists(albumRepository.findById(idAlbum), idAlbum);
         return album.getSongs()
                 .stream()
                 .sorted(Comparator.comparing(Song::getId))
