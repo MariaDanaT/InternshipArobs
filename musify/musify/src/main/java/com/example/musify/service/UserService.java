@@ -12,9 +12,9 @@ import com.example.musify.mapper.UserMapper;
 import com.example.musify.repo.springdata.PlaylistRepository;
 import com.example.musify.repo.springdata.UserRepository;
 import com.example.musify.security.JwtUtils;
+import com.example.musify.service.utilcheck.Checker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,32 +56,18 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<UserViewDTO> inactivate(int id) {
-        Optional<User> optional = userRepository.findById(id);
-        if (optional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no user with id =" + id);
-        }
-        optional.get().setDeleted(true);
-        return Optional.ofNullable(userMapper.userDTOFromUser(optional.get()));
+    public Optional<UserViewDTO> inactivate(int idUser) {
+        Optional<User> optional = userRepository.findById(idUser);
+        User user = Checker.getUserIfExists(optional, idUser);
+        user.setDeleted(true);
+        return Optional.ofNullable(userMapper.userDTOFromUser(user));
     }
 
     @Transactional
     public UserViewDTO update(UserViewDTO userViewDTO) {
         Optional<User> optional = userRepository.findById(userViewDTO.getId());
-        if (optional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no user with id =" + userViewDTO.getId());
-        }
-        User updateUser = optional.get();
-        List<String> fullName = List.of(userViewDTO.getFullName().split(" "));
-        String firstName = fullName.get(0);
-        String lastName = fullName.get(1);
-        updateUser.setFirstName(firstName);
-        updateUser.setLastName(lastName);
-        updateUser.setEmail(userViewDTO.getEmail());
-        updateUser.setCountry(userViewDTO.getCountry());
-        updateUser.setRole(userViewDTO.getRole());
-        updateUser.setDeleted(userViewDTO.getDeleted());
-
+        User updateUser = Checker.getUserIfExists(optional, userViewDTO.getId());
+        userMapper.mergeUserAndUserViewDTO(updateUser,userViewDTO);
         return userMapper.userDTOFromUser(updateUser);
     }
 
@@ -93,12 +79,9 @@ public class UserService {
     }
 
     @Transactional
-    public PlaylistDTO followNewPlaylist(Integer playlistId) {
-        Optional<Playlist> findPlaylistByIdOptional = playlistRepository.findById(playlistId);
-        if (findPlaylistByIdOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with the id = " + playlistId);
-        }
-        Playlist playlist = findPlaylistByIdOptional.get();
+    public PlaylistDTO followNewPlaylist(Integer idPlaylist) {
+        Optional<Playlist> findPlaylistByIdOptional = playlistRepository.findById(idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(findPlaylistByIdOptional, idPlaylist);
         if (!playlist.getType().equals("public")) {
             throw new UnauthorizedException("This playlist can not be followed!");
         }

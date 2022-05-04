@@ -9,8 +9,8 @@ import com.example.musify.mapper.AlbumMapper;
 import com.example.musify.mapper.SongMapper;
 import com.example.musify.repo.springdata.AlbumRepository;
 import com.example.musify.repo.springdata.SongRepository;
+import com.example.musify.service.utilcheck.Checker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,15 +48,8 @@ public class AlbumService {
     @Transactional
     public AlbumDTO update(AlbumDTO albumDTO) {
         Optional<Album> optionalAlbum = albumRepository.findById(albumDTO.getId());
-        if (optionalAlbum.isEmpty()) {
-            throw new ResourceNotFoundException("There is no album with id = " + albumDTO.getId());
-        }
-        Album album = optionalAlbum.get();
-        album.setTitle(albumDTO.getTitle());
-        album.setDescription(albumDTO.getDescription());
-        album.setGenre(albumDTO.getGenre());
-        album.setReleaseDate(albumDTO.getReleaseDate());
-        album.setLabel(albumDTO.getLabel());
+        Album album = Checker.getAlbumIfExists(optionalAlbum, albumDTO.getId());
+        albumMapper.mergeAlbumAndAlbumDTO(album, albumDTO);
 
         return albumMapper.albumToAlbumDTO(album);
     }
@@ -65,29 +58,20 @@ public class AlbumService {
     public List<SongWithAlbumDTO> addSongToAlbum(Integer idSong, Integer idAlbum) {
         Optional<Song> optionalSong = songRepository.findById(idSong);
         Optional<Album> albumOptional = albumRepository.findById(idAlbum);
-        if (optionalSong.isEmpty())
-            throw new ResourceNotFoundException("There is no song with id = " + idSong);
-        if (albumOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no album with id = " + idAlbum);
-        }
-        Song song = optionalSong.get();
-        Album album = albumOptional.get();
+        Song song = Checker.getSongIfExists(optionalSong, idSong);
+        Album album = Checker.getAlbumIfExists(albumOptional, idAlbum);
         song.setAlbum(album);
         album.addSongToAlbum(song);
         return songRepository.findAll()
                 .stream()
-                .map(song1 -> songMapper.songToSongWithAlbumDTO(song1))
+                .map(songMapper::songToSongWithAlbumDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public List<SongDTO> allSongsForAlbum(Integer idAlbum) {
         Optional<Album> albumOptional = albumRepository.findById(idAlbum);
-        if (albumOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no album with id = " + idAlbum);
-        }
-        Album album = albumOptional.get();
-
+        Album album = Checker.getAlbumIfExists(albumOptional, idAlbum);
         return album.getSongs()
                 .stream()
                 .sorted(Comparator.comparing(Song::getId))

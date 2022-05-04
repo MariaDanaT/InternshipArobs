@@ -6,9 +6,7 @@ import com.example.musify.dto.userdto.RegisterUserDTO;
 import com.example.musify.dto.userdto.UserLoginDTO;
 import com.example.musify.dto.userdto.UserViewDTO;
 import com.example.musify.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,10 +15,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping
     public List<UserViewDTO> users() {
@@ -28,38 +26,35 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
-        String token = userService.login(userLoginDTO);
-        return new ResponseEntity<>(token, HttpStatus.OK);
+    public String login(@RequestBody UserLoginDTO userLoginDTO) {
+        return userService.login(userLoginDTO);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserViewDTO> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+    public Optional<UserViewDTO> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
         UserViewDTO userViewDTO = userService.register(registerUserDTO);
-        return new ResponseEntity<>(userViewDTO, HttpStatus.OK);
+        return Optional.of(userViewDTO);
     }
 
     @PutMapping("/delete/{id}")
-    public ResponseEntity<Optional<UserViewDTO>> inactivate(@RequestParam int id) {
-        Optional<UserViewDTO> optional = userService.inactivate(id);
-        return new ResponseEntity<>(optional, HttpStatus.OK);
+    public Optional<UserViewDTO> inactivate(@RequestParam int id) {
+        return userService.inactivate(id);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<UserViewDTO> update(@RequestBody UserViewDTO userViewDTO) {
+    public Optional<UserViewDTO> update(@RequestBody UserViewDTO userViewDTO) {
         UserViewDTO userUpdated = userService.update(userViewDTO);
-        return new ResponseEntity<>(userUpdated, HttpStatus.OK);
+        return Optional.of(userUpdated);
     }
 
     @PostMapping("/follow/{playlistId}")
-    public ResponseEntity<PlaylistDTO> followNewPlaylist(@RequestParam("playlistId") Integer playlistId){
+    public Optional<PlaylistDTO> followNewPlaylist(@RequestParam("playlistId") Integer playlistId) {
         PlaylistDTO playlistAdded = userService.followNewPlaylist(playlistId);
-        return new ResponseEntity<>(playlistAdded, HttpStatus.OK);
+        return Optional.of(playlistAdded);
     }
 
     @GetMapping("/playlistHasOrFollow")
-    public List<PlaylistDTO> getAllPlaylistsThatLoggedUserHasOrFollow(){
-        List<PlaylistDTO> playlists = userService.getAllPlaylistsThatLoggedUserHasOrFollow();
-        return playlists;
+    public List<PlaylistDTO> getAllPlaylistsThatLoggedUserHasOrFollow() {
+        return userService.getAllPlaylistsThatLoggedUserHasOrFollow();
     }
 }

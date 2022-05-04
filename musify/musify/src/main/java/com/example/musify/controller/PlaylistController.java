@@ -5,38 +5,34 @@ import com.example.musify.dto.playlistdto.PlaylistWithSongsTitleDTO;
 import com.example.musify.dto.songdto.SongDTO;
 import com.example.musify.security.JwtUtils;
 import com.example.musify.service.PlaylistService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/playlists")
+@AllArgsConstructor
 public class PlaylistController {
     private final PlaylistService playlistService;
 
-    public PlaylistController(PlaylistService playlistService) {
-        this.playlistService = playlistService;
-    }
-
     @PostMapping
-    public ResponseEntity<PlaylistDTO> create(@RequestBody PlaylistDTO playlistDTO) {
+    public Optional<PlaylistDTO> create(@RequestBody PlaylistDTO playlistDTO) {
         Integer idUser = JwtUtils.getUserIdFromSession();
         PlaylistDTO playlistCreated = playlistService.create(playlistDTO, idUser);
-        return new ResponseEntity<>(playlistCreated, HttpStatus.OK);
+        return Optional.of(playlistCreated);
     }
 
     @PutMapping
-    public ResponseEntity<PlaylistDTO> update(@RequestBody PlaylistDTO playlistDTO) {
+    public Optional<PlaylistDTO> update(@RequestBody PlaylistDTO playlistDTO) {
         PlaylistDTO updatedPlaylist = playlistService.update(playlistDTO);
-        return new ResponseEntity<>(updatedPlaylist, HttpStatus.OK);
+        return Optional.ofNullable(updatedPlaylist);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") Integer id) {
-        playlistService.delete(id);
-        return new ResponseEntity<>("Deleted with success!", HttpStatus.OK);
+    public Optional<PlaylistDTO> delete(@PathVariable("id") Integer idPlaylist) {
+        return Optional.of(playlistService.delete(idPlaylist));
     }
 
     @GetMapping
@@ -45,34 +41,31 @@ public class PlaylistController {
     }
 
     @PostMapping("/{idPlaylist}/{idSong}")
-    public PlaylistWithSongsTitleDTO addSongToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
+    public Optional<PlaylistWithSongsTitleDTO> addSongToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
         PlaylistWithSongsTitleDTO playlistWithSongs = playlistService.addSongToPlaylist(idPlaylist, idSong);
-        return playlistWithSongs;
+        return Optional.of(playlistWithSongs);
     }
 
     @PostMapping("/{idPlaylist}/album/{idAlbum}")
-    public ResponseEntity<List<SongDTO>> addAlbumToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idAlbum") Integer idAlbum) {
-        List<SongDTO> songsFromPlaylist = playlistService.addAlbumToPlaylist(idPlaylist, idAlbum);
-        return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
+    public List<SongDTO> addAlbumToPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idAlbum") Integer idAlbum) {
+        return playlistService.addAlbumToPlaylist(idPlaylist, idAlbum);
     }
 
     @GetMapping("/songs/{idPlaylist}")
-    public ResponseEntity<List<SongDTO>> songsFromPlaylist(@RequestParam("idPlaylist") Integer idPlaylist) {
-        List<SongDTO> songsFromPlaylist = playlistService.songsFromPlaylist(idPlaylist);
-        return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
+    public List<SongDTO> songsFromPlaylist(@RequestParam("idPlaylist") Integer idPlaylist) {
+        return playlistService.songsFromPlaylist(idPlaylist);
     }
 
     @DeleteMapping("/{idPlaylist}/{idSong}")
-    public ResponseEntity<List<SongDTO>> removeSongFromPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
+    public List<SongDTO> removeSongFromPlaylist(@RequestParam("idPlaylist") Integer idPlaylist, @RequestParam("idSong") Integer idSong) {
         List<SongDTO> songsFromPlaylist = playlistService.removeSongFromPlaylist(idPlaylist, idSong);
         playlistService.reindexSongsForPlaylist(idPlaylist);
-        return new ResponseEntity<>(songsFromPlaylist, HttpStatus.OK);
+        return songsFromPlaylist;
     }
 
     @PutMapping("/changeOrderSongInPlaylist/{idPlaylist}/{idSong}/{newPosition}")
     public List<SongDTO> changeOrderSongInPlaylist(@PathVariable("idPlaylist") Integer idPlaylist, @PathVariable("idSong") Integer idSong, @PathVariable("newPosition") Integer newPosition) {
         playlistService.changeOrderSongInPlaylist(idPlaylist, idSong, newPosition);
-        List<SongDTO> songsFromPlaylist = playlistService.songsFromPlaylist(idPlaylist);
-        return songsFromPlaylist;
+        return playlistService.songsFromPlaylist(idPlaylist);
     }
 }

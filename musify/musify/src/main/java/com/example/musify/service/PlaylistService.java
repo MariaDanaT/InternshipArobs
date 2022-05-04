@@ -10,8 +10,8 @@ import com.example.musify.mapper.PlaylistMapper;
 import com.example.musify.mapper.SongMapper;
 import com.example.musify.repo.springdata.*;
 import com.example.musify.security.JwtUtils;
+import com.example.musify.service.utilcheck.Checker;
 import lombok.AllArgsConstructor;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +35,7 @@ public class PlaylistService {
     public PlaylistDTO create(PlaylistDTO playlistDTO, Integer idUser) {
         Playlist playlist = playlistMapper.playlistFromPlaylistDTO(playlistDTO);
         Optional<User> userOptional = userRepository.findById(idUser);
-        if (userOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no user with id=" + idUser);
-        }
-        User user = userOptional.get();
+        User user = Checker.getUserIfExists(userOptional, idUser);
         playlist.setUser(user);
         user.addPlaylistToOwnerUser(playlist);
         return playlistMapper.playlistToPlaylistDTO(playlistRepository.save(playlist));
@@ -47,28 +44,19 @@ public class PlaylistService {
     @Transactional
     public PlaylistDTO update(PlaylistDTO playlistDTO) {
         Optional<Playlist> playlistOptional = playlistRepository.findById(playlistDTO.getId());
-        if (playlistOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id = " + playlistDTO.getId());
-        }
         Integer idUser = JwtUtils.getUserIdFromSession();
-        Playlist playlist = playlistOptional.get();
+        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, playlistDTO.getId());
         if (!idUser.equals(playlist.getUser().getId())) {
             throw new UnauthorizedException("Only the owner can edit playlist!");
         }
-        playlist.setType(playlistDTO.getType());
-        playlist.setCreatedDate(playlistDTO.getCreatedDate());
-        playlist.setLastUpdateDate(playlistDTO.getLastUpdateDate());
-
+        playlistMapper.mergePlaylistAndPlaylistDTO(playlist,playlistDTO);
         return playlistMapper.playlistToPlaylistDTO(playlist);
     }
 
     @Transactional
-    public void delete(Integer id) {
-        Optional<Playlist> optionalPlaylist = playlistRepository.findById(id);
-        if (optionalPlaylist.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id=" + id);
-        }
-        Playlist playlist = optionalPlaylist.get();
+    public PlaylistDTO delete(Integer idPlaylist) {
+        Optional<Playlist> optionalPlaylist = playlistRepository.findById(idPlaylist);
+        Playlist playlist = Checker.getPlaylistIfExists(optionalPlaylist, idPlaylist);
         User loggedUser = userRepository.getById(JwtUtils.getUserIdFromSession());
         if (!loggedUser.getId().equals(playlist.getUser().getId())) {
             throw new UnauthorizedException("Only the owner can delete playlist!");
@@ -77,6 +65,7 @@ public class PlaylistService {
         playlist.getUsers()
                 .forEach(user -> user.removePlaylistsFromFollowedPlaylistsTable(playlist));
         playlistRepository.delete(playlist);
+        return playlistMapper.playlistToPlaylistDTO(playlist);
     }
 
     @Transactional(readOnly = true)
@@ -90,21 +79,16 @@ public class PlaylistService {
     @Transactional
     public PlaylistWithSongsTitleDTO addSongToPlaylist(Integer idPlaylist, Integer idSong) {
         Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        if (playlistOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
-        }
-        Playlist playlist = playlistOptional.get();
+        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
         if (!playlist.getUser().getId().equals(JwtUtils.getUserIdFromSession())) {
             throw new UnauthorizedException("Only the owner can add song to the playlist!");
         }
         Optional<Song> songOptional = songRepository.findById(idSong);
-        if (songOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no song with id = " + idSong);
-        }
         PlaylistsSongs playlistsSongs = new PlaylistsSongs();
-        PlaylistsSongs playlistsSongsToAdd = createPlaylistsSongsWithGivenPlaylistAndSong(playlist, songOptional.get(), playlistsSongs);
+        Song song = Checker.getSongIfExists(songOptional, idSong);
+        PlaylistsSongs playlistsSongsToAdd = createPlaylistsSongsWithGivenPlaylistAndSong(playlist, song, playlistsSongs);
         List<Integer> idSongsForPlaylist = new ArrayList<>();
-        songRepository.findAll(playlist.getId()).forEach(song -> idSongsForPlaylist.add(song.getId()));
+        songRepository.findAll(playlist.getId()).forEach(s -> idSongsForPlaylist.add(s.getId()));
         if (idSongsForPlaylist.contains(idSong)) {
             throw new DuplicateException("This song was added before!");
         }
@@ -118,18 +102,12 @@ public class PlaylistService {
     @Transactional
     public List<SongDTO> addAlbumToPlaylist(Integer idPlaylist, Integer idAlbum) {
         Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        if (playlistOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
-        }
-        Playlist playlist = playlistOptional.get();
+        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
         if (!playlist.getUser().getId().equals(JwtUtils.getUserIdFromSession())) {
             throw new UnauthorizedException("Only the owner can add song to the playlist!");
         }
         Optional<Album> albumOptional = albumRepository.findById(idAlbum);
-        if (albumOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no album with id = " + idAlbum);
-        }
-        Album album = albumOptional.get();
+        Album album = Checker.getAlbumIfExists(albumOptional, idAlbum);
         List<Song> songsExistsInPlaylist = songRepository.findAll(idPlaylist);
         List<Song> songsFromAlbum = album.getSongs().stream()
                 .sorted(Comparator.comparing(Song::getId))
@@ -151,10 +129,8 @@ public class PlaylistService {
     @Transactional
     public List<SongDTO> songsFromPlaylist(Integer idPlaylist) {
         Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        if (playlistOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
-        }
-        if (!playlistOptional.get().getType().equals("public")) {
+        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
+        if (!playlist.getType().equals("public")) {
             throw new UnauthorizedException("Can not show songs!");
         }
         List<Song> songsFromPlaylist = songRepository.findAll(idPlaylist);
@@ -167,15 +143,10 @@ public class PlaylistService {
     @Transactional
     public List<SongDTO> removeSongFromPlaylist(Integer idPlaylist, Integer idSong) {
         Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        if (playlistOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
-        }
-        Playlist playlist = playlistOptional.get();
+        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
         Optional<Song> songOptional = songRepository.findAll(idPlaylist, idSong);
-        if (songOptional.isEmpty()) {
-            throw new ResourceNotFoundException("This song doesn't exist in the playlist!");
-        }
-        Song song = songOptional.get();
+
+        Song song = Checker.getSongIfExistsInPlaylist(songOptional);
         PlaylistsSongs playlistSong = playlistsSongsRepository.findBySongFromPlaylistAndPlaylist(song, playlist);
         playlistsSongsRepository.delete(playlistSong);
         playlist.setLastUpdateDate(Date.valueOf(java.time.LocalDate.now()));
@@ -188,15 +159,9 @@ public class PlaylistService {
     @Transactional
     public void changeOrderSongInPlaylist(Integer idPlaylist, Integer idSong, Integer newPosition) {
         Optional<Playlist> playlistOptional = playlistRepository.findById(idPlaylist);
-        if (playlistOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no playlist with id = " + idPlaylist);
-        }
         Optional<Song> songOptional = songRepository.findAll(idPlaylist, idSong);
-        if (songOptional.isEmpty()) {
-            throw new ResourceNotFoundException("This song doesn't exist in the playlist!");
-        }
-        Song song = songOptional.get();
-        Playlist playlist = playlistOptional.get();
+        Song song = Checker.getSongIfExistsInPlaylist(songOptional);
+        Playlist playlist = Checker.getPlaylistIfExists(playlistOptional, idPlaylist);
         List<Song> songsFromPlaylist = playlistsSongsRepository.findAll(idPlaylist);
         int oldPosition = songsFromPlaylist.indexOf(song);
         LinkedList<Song> songsLinkedList = new LinkedList<>(songsFromPlaylist);

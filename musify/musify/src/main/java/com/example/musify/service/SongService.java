@@ -4,8 +4,8 @@ import com.example.musify.dto.songdto.SongDTO;
 import com.example.musify.entity.Song;
 import com.example.musify.mapper.SongMapper;
 import com.example.musify.repo.springdata.SongRepository;
+import com.example.musify.service.utilcheck.Checker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,14 +31,8 @@ public class SongService {
     @Transactional
     public SongDTO update(SongDTO songDTO) {
         Optional<Song> optionalSong = songRepository.findById(songDTO.getId());
-        if (optionalSong.isEmpty()) {
-            throw new ResourceNotFoundException("There is no song with id = " + songDTO.getId());
-        }
-        Song song = optionalSong.get();
-        song.setTitle(songDTO.getTitle());
-        song.setDuration(songDTO.getDuration());
-        song.setCreationDate(songDTO.getCreationDate());
-
+        Song song = Checker.getSongIfExists(optionalSong, songDTO.getId());
+        songMapper.mergeSongAndSongDTO(song,songDTO);
         return songMapper.songToSongDTO(song);
     }
 

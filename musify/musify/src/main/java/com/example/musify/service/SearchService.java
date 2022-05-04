@@ -34,7 +34,7 @@ public class SearchService {
     public List<PersonDTO> searchPersonByName(String name) {
         List<Person> persons = personRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
         return persons.stream()
-                .map(person -> personMapper.personToPersonDTO(person))
+                .map(personMapper::personToPersonDTO)
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +42,7 @@ public class SearchService {
     public List<PersonDTO> searchPersonStageName(String name) {
         List<Person> persons = personRepository.findByStageNameContainingIgnoreCase(name);
         return persons.stream()
-                .map(person -> personMapper.personToPersonDTO(person))
+                .map(personMapper::personToPersonDTO)
                 .collect(Collectors.toList());
     }
 
@@ -50,7 +50,7 @@ public class SearchService {
     public List<AlbumDTO> searchAlbumByTitle(String title) {
         List<Album> albums = albumRepository.findByTitleContainingIgnoreCase(title);
         return albums.stream()
-                .map(album -> albumMapper.albumToAlbumDTO(album))
+                .map(albumMapper::albumToAlbumDTO)
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +58,7 @@ public class SearchService {
     public List<AlbumDTO> searchAlbumByGenre(String genre) {
         List<Album> albums = albumRepository.findByGenreContainingIgnoreCase(genre);
         return albums.stream()
-                .map(album -> albumMapper.albumToAlbumDTO(album))
+                .map(albumMapper::albumToAlbumDTO)
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +66,7 @@ public class SearchService {
     public List<SongDTO> searchSongsByTitle(String title) {
         List<Song> songs = songRepository.findByTitleContainingIgnoreCase(title);
         return songs.stream()
-                .map(song -> songMapper.songToSongDTO(song))
+                .map(songMapper::songToSongDTO)
                 .collect(Collectors.toList());
     }
 

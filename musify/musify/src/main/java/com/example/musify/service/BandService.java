@@ -4,8 +4,8 @@ import com.example.musify.dto.albumdto.AlbumDTO;
 import com.example.musify.entity.Band;
 import com.example.musify.mapper.AlbumMapper;
 import com.example.musify.repo.springdata.BandRepository;
+import com.example.musify.service.utilcheck.Checker;
 import lombok.AllArgsConstructor;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +22,7 @@ public class BandService {
     @Transactional
     public List<AlbumDTO> loadAllAlbums(Integer idBand) {
         Optional<Band> bandOptional = bandRepository.findById(idBand);
-        if (bandOptional.isEmpty()) {
-            throw new ResourceNotFoundException("There is no band with id = " + idBand);
-        }
-        Band band = bandOptional.get();
+        Band band = Checker.getBandIfExists(bandOptional, idBand);
         return band.getAlbums()
                 .stream()
                 .map(albumMapper::albumToAlbumDTO)

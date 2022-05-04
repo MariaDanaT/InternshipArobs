@@ -11,8 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class JwtUtils {
-    private static String signatureSecret = "myMusifyApp";
-    private static String issuer = "musify";
+    private static final String signatureSecret = "myMusifyApp";
+    private static final String issuer = "musify";
 
     public static String generateToken(int userId, String email, String role) {
         Algorithm algorithm = Algorithm.HMAC256(signatureSecret);

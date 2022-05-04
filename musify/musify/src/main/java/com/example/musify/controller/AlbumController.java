@@ -4,11 +4,9 @@ import com.example.musify.dto.albumdto.AlbumDTO;
 import com.example.musify.dto.songdto.SongDTO;
 import com.example.musify.dto.songdto.SongWithAlbumDTO;
 import com.example.musify.exception.UnauthorizedException;
-import com.example.musify.security.JwtUtils;
 import com.example.musify.service.AlbumService;
+import com.example.musify.service.utilcheck.Checker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,26 +26,26 @@ public class AlbumController {
     }
 
     @PostMapping
-    public ResponseEntity<AlbumDTO> create(@RequestBody @Valid AlbumDTO albumDTO) {
-        if(!JwtUtils.getUserRoleFromSession().equals("admin"))
+    public AlbumDTO create(@RequestBody @Valid AlbumDTO albumDTO) {
+        if (!Checker.isAdmin())
             throw new UnauthorizedException("Only admins can add albums!");
         AlbumDTO albumToCreate = albumService.create(albumDTO);
-        return new ResponseEntity<>(albumToCreate, HttpStatus.OK);
+        return albumToCreate;
     }
 
     @PutMapping
-    public ResponseEntity<AlbumDTO> update(@RequestBody @Valid AlbumDTO albumDTO) {
+    public AlbumDTO update(@RequestBody @Valid AlbumDTO albumDTO) {
         AlbumDTO updatedAlbum = albumService.update(albumDTO);
-        return new ResponseEntity<>(updatedAlbum, HttpStatus.OK);
+        return updatedAlbum;
     }
 
     @PostMapping("/{idSong}/{idAlbum}")
-    public ResponseEntity<List<SongWithAlbumDTO>> addSongToAlbum(@RequestParam("idSong") Integer idSong, @RequestParam("idAlbum") Integer idAlbum) {
-        return new ResponseEntity<>(albumService.addSongToAlbum(idSong, idAlbum), HttpStatus.OK);
+    public List<SongWithAlbumDTO> addSongToAlbum(@RequestParam("idSong") Integer idSong, @RequestParam("idAlbum") Integer idAlbum) {
+        return albumService.addSongToAlbum(idSong, idAlbum);
     }
 
     @GetMapping("/songs/{idAlbum}")
-    public ResponseEntity<List<SongDTO>> allSongsForAlbum(@PathVariable("idAlbum") Integer idAlbum){
-        return new ResponseEntity<>(albumService.allSongsForAlbum(idAlbum), HttpStatus.OK);
+    public List<SongDTO> allSongsForAlbum(@PathVariable("idAlbum") Integer idAlbum) {
+        return albumService.allSongsForAlbum(idAlbum);
     }
 }

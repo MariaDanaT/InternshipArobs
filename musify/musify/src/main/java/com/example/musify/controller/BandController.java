@@ -19,8 +19,8 @@ public class BandController {
     private final BandService bandService;
 
     @GetMapping("/albums/{idBand}")
-    public ResponseEntity<List<AlbumDTO>> loadAllAlbums(@PathVariable("idBand") Integer idBand) {
+    public List<AlbumDTO> loadAllAlbums(@PathVariable("idBand") Integer idBand) {
         List<AlbumDTO> albumsForBand = bandService.loadAllAlbums(idBand);
-        return new ResponseEntity<>(albumsForBand, HttpStatus.OK);
+        return albumsForBand;
     }
 }

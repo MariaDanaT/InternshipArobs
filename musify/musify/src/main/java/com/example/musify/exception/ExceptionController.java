@@ -19,7 +19,7 @@ import java.util.List;
 public class ExceptionController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = UnauthorizedException.class)
     public ResponseEntity<Object> exception(UnauthorizedException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
@@ -29,7 +29,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = DuplicateException.class)
     public ResponseEntity<Object> exception(DuplicateException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
